@@ -5,14 +5,14 @@
 テストあり。
 
 ```shell
-make -j 8
+make CFLAGS="-O2 -fPIC" -j 8
 make check
 ```
 
 テストなし。
 
 ```shell
-make -j 8 no_test
+make CFLAGS="-O2 -fPIC" -j 8 no_test
 ```
 
 ## 初期方針
