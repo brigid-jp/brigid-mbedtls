@@ -12,17 +12,9 @@ namespace brigid {
   namespace {
     using self_t = ctr_drbg;
 
-    void impl_call(lua_State* L) {
-      new_userdata<self_t>(L, self_t::name);
-    }
-
-    void impl_gc(lua_State* L) {
-      static_cast<self_t*>(luaL_checkudata(L, 1, self_t::name))->~self_t();
-    }
-
     void impl_seed(lua_State* L) {
-      auto* self = static_cast<self_t*>(luaL_checkudata(L, 1, self_t::name));
-      auto* that = static_cast<entropy_t*>(luaL_checkudata(L, 2, entropy_t::name));
+      auto* self = self_t::check(L, 1);
+      auto* that = entropy_t::check(L, 2);
       check(mbedtls_ctr_drbg_seed(self->get(), mbedtls_entropy_func, that->get(), nullptr, 0));
     }
   }
@@ -34,13 +26,13 @@ namespace brigid {
       lua_pushvalue(L, -2);
       lua_setfield(L, -2, "__index");
 
-      lua_pushcfunction(L, function<impl_gc>::value);
+      lua_pushcfunction(L, function<self_t::destruct>::value);
       lua_setfield(L, -2, "__gc");
 
       lua_pop(L, 1);
 
       lua_newtable(L);
-      lua_pushcfunction(L, function<impl_call>::value);
+      lua_pushcfunction(L, function<self_t::construct>::value);
       lua_setfield(L, -2, "__call");
       lua_setmetatable(L, -2);
 

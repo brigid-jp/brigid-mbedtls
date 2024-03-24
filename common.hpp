@@ -48,6 +48,19 @@ namespace brigid {
     return userdata;
   }
 
+  template <void (*T)(lua_State*)>
+  inline void set_field(lua_State* L, int index, const char* key, function<T>) {
+#if LUA_VERSION_NUM >= 502
+    index = lua_absindex(L, index);
+#else
+    if (LUA_REGISTRYINDEX < index && index < 1) {
+      index = lua_gettop(L) + index + 1;
+    }
+#endif
+    lua_pushcfunction(L, function<T>::value);
+    lua_setfield(L, index, key);
+  }
+
   class thread_reference {
   public:
     thread_reference(const thread_reference&) = delete;
@@ -115,6 +128,18 @@ namespace brigid {
 
     T_context* get() {
       return &context_;
+    }
+
+    static T* check(lua_State* L, int arg) {
+      return static_cast<T*>(luaL_checkudata(L, arg, T::name));
+    }
+
+    static void construct(lua_State* L) {
+      new_userdata<T>(L, T::name);
+    }
+
+    static void destruct(lua_State* L) {
+      check(L, 1)->~T();
     }
 
   private:
