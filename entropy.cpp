@@ -9,11 +9,12 @@ namespace brigid {
 
     void impl_func(lua_State* L) {
       auto* self = static_cast<self_t*>(luaL_checkudata(L, 1, self_t::name));
-      const auto size = luaL_checkinteger(L, 2);
+      auto size = luaL_checkinteger(L, 2);
       if (size < 0) {
         luaL_argerror(L, 2, "out of bounds");
         return;
       }
+
       std::vector<unsigned char> buffer(size);
       check(mbedtls_entropy_func(self->get(), buffer.data(), buffer.size()));
       lua_pushlstring(L, reinterpret_cast<const char*>(buffer.data()), buffer.size());

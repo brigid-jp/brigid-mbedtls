@@ -91,6 +91,10 @@ namespace brigid {
       return *this;
     }
 
+    explicit operator bool() const {
+      return thread_;
+    }
+
     lua_State* get() const {
       return thread_;
     }
