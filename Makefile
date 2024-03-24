@@ -1,7 +1,7 @@
 CXXFLAGS += -Wall -W -std=c++11 $(CFLAGS)
 CPPFLAGS += -I$(LUA_INCDIR)
 LDFLAGS += $(LIBFLAG)
-LDLIBS += -lpthread -ldl
+LDLIBS +=
 
 TARGET = mbedtls.so
 OBJS = module.o
