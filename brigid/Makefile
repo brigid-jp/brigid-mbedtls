@@ -7,6 +7,7 @@ VPATH = ..
 TARGET = mbedtls.so
 OBJS = \
 	common.o \
+	base64.o \
 	ctr_drbg.o \
 	entropy.o \
 	module.o
