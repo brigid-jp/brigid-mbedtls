@@ -1,6 +1,6 @@
 CXXFLAGS += -Wall -W -std=c++11 $(CFLAGS)
 CPPFLAGS += -I../mbedtls/include -I$(LUA_INCDIR) -MMD
-LDFLAGS += -L../mbedtls/library $(LIBFLAG)
+LDFLAGS += -L../mbedtls/library $(LIBFLAG) 
 LDLIBS += -lmbedcrypto
 
 VPATH = ..
@@ -14,7 +14,7 @@ OBJS = \
 all: $(TARGET)
 
 clean:
-	rm -f *.o $(TARGET)
+	rm -f *.d *.o $(TARGET)
 
 install:
 	mkdir -p $(LIBDIR)/brigid
@@ -26,4 +26,4 @@ $(TARGET): $(OBJS)
 .cpp.o:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
 
-$(OBJS): ../common.hpp
+-include *.d

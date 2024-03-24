@@ -1,25 +1,22 @@
 #include "common.hpp"
-
-#include <mbedtls/entropy.h>
+#include "entropy.hpp"
 
 #include <vector>
 
 namespace brigid {
   namespace {
-    static constexpr const char metaname[] = "brigid.mbedtls.entropy";
-    using entropy_t = context<mbedtls_entropy_context, mbedtls_entropy_init, mbedtls_entropy_free>;
+    using self_t = entropy;
 
     void impl_call(lua_State* L) {
-      new_userdata<entropy_t>(L, metaname);
+      new_userdata<self_t>(L, self_t::name);
     }
 
     void impl_gc(lua_State* L) {
-      auto* self = static_cast<entropy_t*>(luaL_checkudata(L, 1, metaname));
-      self->~entropy_t();
+      static_cast<self_t*>(luaL_checkudata(L, 1, self_t::name))->~self_t();
     }
 
     void impl_func(lua_State* L) {
-      auto* self = static_cast<entropy_t*>(luaL_checkudata(L, 1, metaname));
+      auto* self = static_cast<self_t*>(luaL_checkudata(L, 1, self_t::name));
       const auto size = luaL_checkinteger(L, 2);
       if (size < 0) {
         luaL_argerror(L, 2, "out of bounds");
@@ -34,7 +31,7 @@ namespace brigid {
   void initialize_entropy(lua_State* L) {
     lua_newtable(L);
     {
-      luaL_newmetatable(L, metaname);
+      luaL_newmetatable(L, self_t::name);
       lua_pushvalue(L, -2);
       lua_setfield(L, -2, "__index");
 
@@ -50,7 +47,6 @@ namespace brigid {
 
       lua_pushcfunction(L, function<impl_func>::value);
       lua_setfield(L, -2, "func");
-
     }
     lua_setfield(L, -2, "entropy");
   }
