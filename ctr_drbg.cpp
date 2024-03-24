@@ -4,7 +4,7 @@
 #include <mbedtls/ctr_drbg.h>
 
 namespace brigid {
-  class ctr_drbg : public context<mbedtls_ctr_drbg_context, mbedtls_ctr_drbg_init, mbedtls_ctr_drbg_free> {
+  class ctr_drbg : public context<ctr_drbg, mbedtls_ctr_drbg_context, mbedtls_ctr_drbg_init, mbedtls_ctr_drbg_free> {
   public:
     static constexpr const char* name = "brigid.mbedtls.ctr_drbg";
   };
@@ -22,7 +22,7 @@ namespace brigid {
 
     void impl_seed(lua_State* L) {
       auto* self = static_cast<self_t*>(luaL_checkudata(L, 1, self_t::name));
-      auto* that = static_cast<entropy*>(luaL_checkudata(L, 2, entropy::name));
+      auto* that = static_cast<entropy_t*>(luaL_checkudata(L, 2, entropy_t::name));
       check(mbedtls_ctr_drbg_seed(self->get(), mbedtls_entropy_func, that->get(), nullptr, 0));
     }
   }

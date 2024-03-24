@@ -48,16 +48,77 @@ namespace brigid {
     return userdata;
   }
 
-  template <class T, void (*T_init)(T*), void (*T_free)(T*)>
+  class thread_reference {
+  public:
+    thread_reference(const thread_reference&) = delete;
+    thread_reference& operator=(const thread_reference&) = delete;
+
+    thread_reference() = default;
+
+    ~thread_reference() {
+      unref();
+    }
+
+    explicit thread_reference(lua_State* L) {
+      thread_ = lua_newthread(L);
+      ref_ = luaL_ref(L, LUA_REGISTRYINDEX);
+    }
+
+    thread_reference(thread_reference&& that) : thread_(that.thread_), ref_(that.ref_) {
+      that.reset();
+    }
+
+    thread_reference& operator=(thread_reference&& that) {
+      if (this != &that) {
+        unref();
+        thread_ = that.thread_;
+        ref_ = that.ref_;
+        that.reset();
+      }
+      return *this;
+    }
+
+    lua_State* get() const {
+      return thread_;
+    }
+
+  private:
+    lua_State* thread_ = nullptr;;
+    int ref_ = LUA_NOREF;
+
+    void reset() {
+      thread_ = nullptr;
+      ref_ = LUA_NOREF;
+    }
+
+    void unref() {
+      if (lua_State* T = get()) {
+        luaL_unref(T, LUA_REGISTRYINDEX, ref_);
+        reset();
+      }
+    }
+  };
+
+  template <class T, class T_context, void (*T_init)(T_context*), void (*T_free)(T_context*)>
   class context {
   public:
-    context() : context_() { T_init(&context_); }
-    ~context() { T_free(&context_); }
     context(const context&) = delete;
     context& operator=(const context&) = delete;
-    T* get() { return &context_; }
+
+    context() {
+      T_init(&context_);
+    }
+
+    ~context() {
+      T_free(&context_);
+    }
+
+    T_context* get() {
+      return &context_;
+    }
+
   private:
-    T context_;
+    T_context context_ = {};
   };
 
   void check(int);

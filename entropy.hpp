@@ -6,7 +6,7 @@
 #include <mbedtls/entropy.h>
 
 namespace brigid {
-  class entropy : public context<mbedtls_entropy_context, mbedtls_entropy_init, mbedtls_entropy_free> {
+  class entropy_t : public context<entropy_t, mbedtls_entropy_context, mbedtls_entropy_init, mbedtls_entropy_free> {
   public:
     static constexpr const char* name = "brigid.mbedtls.entropy";
   };

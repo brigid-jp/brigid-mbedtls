@@ -5,7 +5,7 @@
 
 namespace brigid {
   namespace {
-    using self_t = entropy;
+    using self_t = entropy_t;
 
     void impl_call(lua_State* L) {
       new_userdata<self_t>(L, self_t::name);
