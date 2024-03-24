@@ -4,7 +4,10 @@ LDFLAGS += $(LIBFLAG)
 LDLIBS +=
 
 TARGET = mbedtls.so
-OBJS = module.o
+OBJS = \
+	ctr_drbg.o \
+	entropy.o \
+	module.o
 
 all: $(TARGET)
 
