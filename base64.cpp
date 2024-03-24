@@ -19,7 +19,7 @@ namespace brigid {
     void impl_decode(lua_State* L) {
       std::size_t source_size = 0;
       const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 1, &source_size));
-      std::vector<unsigned char> buffer((source_size + 3) / 4 * 3 + 1);
+      std::vector<unsigned char> buffer((source_size + 3) / 4 * 3);
       std::size_t buffer_size = 0;
       check(mbedtls_base64_decode(buffer.data(), buffer.size(), &buffer_size, source_data, source_size));
       lua_pushlstring(L, reinterpret_cast<const char*>(buffer.data()), buffer_size);

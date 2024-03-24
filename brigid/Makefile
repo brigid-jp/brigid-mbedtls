@@ -9,6 +9,8 @@ OBJS = \
 	common.o \
 	base64.o \
 	ctr_drbg.o \
+	ecp.o \
+	ecp_keypair.o \
 	entropy.o \
 	pk.o \
 	module.o

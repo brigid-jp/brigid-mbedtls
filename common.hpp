@@ -150,13 +150,20 @@ namespace brigid {
       return static_cast<T*>(luaL_checkudata(L, arg, T::name));
     }
 
-    static void construct(lua_State* L) {
-      new_userdata<T>(L, T::name);
+    static T* construct(lua_State* L) {
+      return new_userdata<T>(L, T::name);
     }
 
-    static void destruct(lua_State* L) {
+    static void impl_constructor(lua_State* L) {
+      construct(L);
+    }
+
+    static void impl_destructor(lua_State* L) {
       check(L, 1)->~T();
     }
+
+    using constructor = function<impl_constructor>;
+    using destructor = function<impl_destructor>;
 
   private:
     T_context context_ = {};

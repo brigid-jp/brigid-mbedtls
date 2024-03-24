@@ -43,11 +43,11 @@ namespace brigid {
       luaL_newmetatable(L, self_t::name);
       lua_pushvalue(L, -2);
       lua_setfield(L, -2, "__index");
-      set_field(L, -1, "__gc", function<self_t::destruct>());
+      set_field(L, -1, "__gc", self_t::destructor());
       lua_pop(L, 1);
 
       lua_newtable(L);
-      set_field(L, -1, "__call", function<self_t::construct>());
+      set_field(L, -1, "__call", self_t::constructor());
       lua_setmetatable(L, -2);
 
       set_field(L, -1, "seed", function<impl_seed>());
