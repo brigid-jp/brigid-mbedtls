@@ -3,6 +3,8 @@
 
 #include <mbedtls/ctr_drbg.h>
 
+#include <vector>
+
 namespace brigid {
   class ctr_drbg_t : public context<ctr_drbg_t, mbedtls_ctr_drbg_context, mbedtls_ctr_drbg_init, mbedtls_ctr_drbg_free> {
   public:
@@ -27,6 +29,19 @@ namespace brigid {
       lua_settop(T, 0);
       lua_xmove(L, T, 1);
     }
+
+    void impl_random(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      auto size = luaL_checkinteger(L, 2);
+      if (size < 0) {
+        luaL_argerror(L, 2, "out of bounds");
+        return;
+      }
+
+      std::vector<unsigned char> buffer(size);
+      check(mbedtls_ctr_drbg_random(self->get(), buffer.data(), buffer.size()));
+      lua_pushlstring(L, reinterpret_cast<const char*>(buffer.data()), buffer.size());
+    }
   }
 
   void initialize_ctr_drbg(lua_State* L) {
@@ -43,6 +58,7 @@ namespace brigid {
       lua_setmetatable(L, -2);
 
       set_field(L, -1, "seed", function<impl_seed>());
+      set_field(L, -1, "random", function<impl_random>());
     }
     lua_setfield(L, -2, "ctr_drbg");
   }
