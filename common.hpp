@@ -48,15 +48,27 @@ namespace brigid {
     return userdata;
   }
 
-  template <void (*T)(lua_State*)>
-  inline void set_field(lua_State* L, int index, const char* key, function<T>) {
+  inline int abs_index(lua_State* L, int index) {
 #if LUA_VERSION_NUM >= 502
-    index = lua_absindex(L, index);
+    return lua_absindex(L, index);
 #else
-    if (LUA_REGISTRYINDEX < index && index < 1) {
-      index = lua_gettop(L) + index + 1;
+    if (index > 0 || index <= LUA_REGISTRYINDEX) {
+      return index;
+    } else {
+      return lua_gettop(L) + index + 1;
     }
 #endif
+  }
+
+  inline void set_field(lua_State* L, int index, const char* key, lua_Integer value) {
+    index = abs_index(L, index);
+    lua_pushinteger(L, value);
+    lua_setfield(L, index, key);
+  }
+
+  template <void (*T)(lua_State*)>
+  inline void set_field(lua_State* L, int index, const char* key, function<T>) {
+    index = abs_index(L, index);
     lua_pushcfunction(L, function<T>::value);
     lua_setfield(L, index, key);
   }

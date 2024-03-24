@@ -10,6 +10,7 @@ OBJS = \
 	base64.o \
 	ctr_drbg.o \
 	entropy.o \
+	pk.o \
 	module.o
 
 all: $(TARGET)
