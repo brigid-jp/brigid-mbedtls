@@ -1,5 +1,4 @@
 #! /bin/sh -e
-set -o pipefail
 
 for i in test/test*.lua
 do
