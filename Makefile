@@ -1,7 +1,7 @@
 CXXFLAGS += -Wall -W -std=c++11 $(CFLAGS)
-CPPFLAGS += -I$(LUA_INCDIR)
-LDFLAGS += $(LIBFLAG)
-LDLIBS +=
+CPPFLAGS += -Imbedtls/include -I$(LUA_INCDIR)
+LDFLAGS += -Lmbedtls/library $(LIBFLAG)
+LDLIBS += -lmbedcrypto
 
 TARGET = mbedtls.so
 OBJS = \
