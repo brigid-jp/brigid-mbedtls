@@ -9,6 +9,7 @@ namespace brigid {
   void initialize_ecdsa(lua_State*);
   void initialize_ecp(lua_State*);
   void initialize_entropy(lua_State*);
+  void initialize_gcm(lua_State*);
   void initialize_md(lua_State*);
   void initialize_mpi(lua_State*);
   void initialize_pk(lua_State*);
@@ -21,6 +22,7 @@ namespace brigid {
     initialize_ecdsa(L);
     initialize_ecp(L);
     initialize_entropy(L);
+    initialize_gcm(L);
     initialize_md(L);
     initialize_mpi(L);
     initialize_pk(L);
