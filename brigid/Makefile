@@ -10,6 +10,7 @@ OBJS = \
 	base64.o \
 	ctr_drbg.o \
 	ecdh.o \
+	ecdsa.o \
 	ecp.o \
 	ecp_group.o \
 	ecp_keypair.o \
