@@ -10,6 +10,7 @@ OBJS = \
 	base64.o \
 	ctr_drbg.o \
 	ecp.o \
+	ecp_group.o \
 	ecp_keypair.o \
 	ecp_point.o \
 	entropy.o \
