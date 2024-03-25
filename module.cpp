@@ -4,6 +4,7 @@
 namespace brigid {
   void initialize_common(lua_State*);
   void initialize_base64(lua_State*);
+  void initialize_cipher(lua_State*);
   void initialize_ctr_drbg(lua_State*);
   void initialize_ecdh(lua_State*);
   void initialize_ecdsa(lua_State*);
@@ -17,6 +18,7 @@ namespace brigid {
   void initialize(lua_State* L) {
     initialize_common(L);
     initialize_base64(L);
+    initialize_cipher(L);
     initialize_ctr_drbg(L);
     initialize_ecdh(L);
     initialize_ecdsa(L);

@@ -8,6 +8,7 @@ TARGET = mbedtls.so
 OBJS = \
 	common.o \
 	base64.o \
+	cipher.o \
 	ctr_drbg.o \
 	ecdh.o \
 	ecdsa.o \
