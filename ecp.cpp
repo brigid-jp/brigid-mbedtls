@@ -11,8 +11,8 @@ namespace brigid {
     void impl_gen_key(lua_State* L) {
       auto group_id = luaL_checkinteger(L, 1);
       auto* ctr_drbg = ctr_drbg_t::check(L, 2);
-      auto* keypair = ecp_keypair_t::construct(L);
-      check(mbedtls_ecp_gen_key(static_cast<mbedtls_ecp_group_id>(group_id), keypair->get(), mbedtls_ctr_drbg_random, ctr_drbg->get()));
+      auto* result = ecp_keypair_t::construct(L);
+      check(mbedtls_ecp_gen_key(static_cast<mbedtls_ecp_group_id>(group_id), result->get(), mbedtls_ctr_drbg_random, ctr_drbg->get()));
     }
   }
 

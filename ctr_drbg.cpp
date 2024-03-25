@@ -17,7 +17,6 @@ namespace brigid {
         self->ref = thread_reference(L);
       }
       auto* T = self->ref.get();
-
       lua_pushvalue(L, 2);
       lua_settop(T, 0);
       lua_xmove(L, T, 1);
@@ -30,7 +29,6 @@ namespace brigid {
         luaL_argerror(L, 2, "out of bounds");
         return;
       }
-
       std::vector<unsigned char> buffer(size);
       check(mbedtls_ctr_drbg_random(self->get(), buffer.data(), buffer.size()));
       lua_pushlstring(L, reinterpret_cast<const char*>(buffer.data()), buffer.size());

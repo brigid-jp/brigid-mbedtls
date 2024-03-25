@@ -7,44 +7,42 @@
 
 #include <vector>
 
-#include <iostream>
-
 namespace brigid {
   namespace {
     using self_t = pk_t;
 
     void impl_setup(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto type = luaL_checkinteger(L, 2);
-      check(mbedtls_pk_setup(self->get(), mbedtls_pk_info_from_type(static_cast<mbedtls_pk_type_t>(type))));
+      auto info_type = static_cast<mbedtls_pk_type_t>(luaL_checkinteger(L, 2));
+      check(mbedtls_pk_setup(self->get(), mbedtls_pk_info_from_type(info_type)));
     }
 
     void impl_import_ec(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto* keypair = ecp_keypair_t::check(L, 2);
-      auto* ec = mbedtls_pk_ec(*self->get());
-      if (!ec) {
+      auto* source = ecp_keypair_t::check(L, 2);
+      auto* target = mbedtls_pk_ec(*self->get());
+      if (!target) {
         luaL_argerror(L, 1, "EC context missing in the PK context");
       }
       check(mbedtls_ecp_export(
-          keypair->get(),
-          &ec->MBEDTLS_PRIVATE(grp),
-          &ec->MBEDTLS_PRIVATE(d),
-          &ec->MBEDTLS_PRIVATE(Q)));
+          source->get(),
+          &target->MBEDTLS_PRIVATE(grp),
+          &target->MBEDTLS_PRIVATE(d),
+          &target->MBEDTLS_PRIVATE(Q)));
     }
 
     void impl_export_ec(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto* ec = mbedtls_pk_ec(*self->get());
-      if (!ec) {
+      auto* source = mbedtls_pk_ec(*self->get());
+      if (!source) {
         luaL_argerror(L, 1, "EC context missing in the PK context");
       }
-      auto* keypair = ecp_keypair_t::construct(L);
+      auto* target = ecp_keypair_t::construct(L);
       check(mbedtls_ecp_export(
-          ec,
-          &keypair->get()->MBEDTLS_PRIVATE(grp),
-          &keypair->get()->MBEDTLS_PRIVATE(d),
-          &keypair->get()->MBEDTLS_PRIVATE(Q)));
+          source,
+          &target->get()->MBEDTLS_PRIVATE(grp),
+          &target->get()->MBEDTLS_PRIVATE(d),
+          &target->get()->MBEDTLS_PRIVATE(Q)));
     }
 
     void impl_parse_key(lua_State* L) {
