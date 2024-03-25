@@ -32,7 +32,7 @@ do
   end
 end
 
--- openssl ec -pubout <key.pem >pubkey.pem
+-- openssl ec -pubout <key1.pem >pubkey1.pem
 local pubkey_pem = [[
 -----BEGIN PUBLIC KEY-----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8xGMev+n8tdsj7S3yLkWYy84J5DY
@@ -40,7 +40,7 @@ bh/cS6zrRM+c1x38WCfd2RMOSDM4EkWx84hiV/HcVV5aLyeQF5pmTEsvoA==
 -----END PUBLIC KEY-----
 ]]
 
--- openssl pkey -pubin -outform der <pubkey.pem | tail -b 65 | xxd -i -c 8
+-- openssl pkey -pubin -outform der <pubkey1.pem | tail -b 65 | xxd -i -c 8
 local pubkey_bin = string.char(
   0x04, 0xf3, 0x11, 0x8c, 0x7a, 0xff, 0xa7, 0xf2,
   0xd7, 0x6c, 0x8f, 0xb4, 0xb7, 0xc8, 0xb9, 0x16,

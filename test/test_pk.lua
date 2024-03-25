@@ -12,7 +12,7 @@ do
   assert(pk:setup(mbedtls.pk.ECKEY))
 end
 
--- openssl ecparam -genkey -name prime256v1 -noout >key.pem
+-- openssl ecparam -genkey -name prime256v1 -noout >key1.pem
 local key_pem = [[
 -----BEGIN EC PRIVATE KEY-----
 MHcCAQEEII7NAJCFPZZP6aLyblWg2kXD1tfRgPSjAWr8eqpYzKH8oAoGCCqGSM49
@@ -21,7 +21,7 @@ SDM4EkWx84hiV/HcVV5aLyeQF5pmTEsvoA==
 -----END EC PRIVATE KEY-----
 ]]
 
--- openssl ec -pubout <key.pem >pubkey.pem
+-- openssl ec -pubout <key1.pem >pubkey1.pem
 local pubkey_pem = [[
 -----BEGIN PUBLIC KEY-----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8xGMev+n8tdsj7S3yLkWYy84J5DY
