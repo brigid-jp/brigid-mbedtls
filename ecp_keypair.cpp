@@ -3,6 +3,7 @@
 #include "ecp_group.hpp"
 #include "ecp_keypair.hpp"
 #include "ecp_point.hpp"
+#include "mpi.hpp"
 
 namespace brigid {
   namespace {
@@ -25,6 +26,18 @@ namespace brigid {
       auto* self = self_t::check(L, 1);
       auto* result = ecp_group_t::construct(L);
       check(mbedtls_ecp_group_copy(result->get(), &self->get()->MBEDTLS_PRIVATE(grp)));
+    }
+
+    void impl_set_key(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      auto* source = mpi_t::check(L, 2);
+      check(mbedtls_mpi_copy(&self->get()->MBEDTLS_PRIVATE(d), source->get()));
+    }
+
+    void impl_get_key(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      auto* result = mpi_t::construct(L);
+      check(mbedtls_mpi_copy(result->get(), &self->get()->MBEDTLS_PRIVATE(d)));
     }
 
     void impl_set_public_key(lua_State* L) {
@@ -56,6 +69,8 @@ namespace brigid {
       set_field(L, -1, "gen_key", function<impl_gen_key>());
       set_field(L, -1, "set_group", function<impl_set_group>());
       set_field(L, -1, "get_group", function<impl_get_group>());
+      set_field(L, -1, "set_key", function<impl_set_key>());
+      set_field(L, -1, "get_key", function<impl_get_key>());
       set_field(L, -1, "set_public_key", function<impl_set_public_key>());
       set_field(L, -1, "get_public_key", function<impl_get_public_key>());
     }

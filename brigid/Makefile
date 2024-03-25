@@ -16,6 +16,7 @@ OBJS = \
 	ecp_keypair.o \
 	ecp_point.o \
 	entropy.o \
+	mpi.o \
 	pk.o \
 	module.o
 
