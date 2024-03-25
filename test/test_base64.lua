@@ -7,6 +7,9 @@ local data = {
   { "f", "Zg==" };
   { "fo", "Zm8=" };
   { "foo", "Zm9v" };
+  { ("foo"):rep(257), ("Zm9v"):rep(257) };
+  { "日本語", "5pel5pys6Kqe" };
+  { ("日本語"):rep(127), ("5pel5pys6Kqe"):rep(127) };
 }
 
 for i, v in ipairs(data) do
@@ -39,3 +42,4 @@ for i, v in ipairs(data) do
   assert(encode_base64url(v[1]) == v[2])
   assert(decode_base64url(v[2]) == v[1])
 end
+

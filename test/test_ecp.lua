@@ -31,5 +31,3 @@ do
     io.write(pubkey_pem)
   end
 end
-
-
