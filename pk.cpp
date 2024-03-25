@@ -1,14 +1,15 @@
 #include "common.hpp"
+#include "ctr_drbg.hpp"
 #include "ecp_keypair.hpp"
+#include "pk.hpp"
 
-#include <mbedtls/pk.h>
+#include <mbedtls/base64.h>
+
+#include <vector>
+
+#include <iostream>
 
 namespace brigid {
-  class pk_t : public context<pk_t, mbedtls_pk_context, mbedtls_pk_init, mbedtls_pk_free> {
-  public:
-    static constexpr const char* name = "brigid.mbedtls.pk";
-  };
-
   namespace {
     using self_t = pk_t;
 
@@ -46,8 +47,43 @@ namespace brigid {
           &keypair->get()->MBEDTLS_PRIVATE(Q)));
     }
 
+    void impl_parse_key(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      std::size_t source_size = 0;
+      const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 2, &source_size));
+      auto* ctr_drbg = ctr_drbg_t::check(L, 3);
+      check(mbedtls_pk_parse_key(
+          self->get(),
+          source_data,
+          source_size + 1,
+          nullptr,
+          0,
+          mbedtls_ctr_drbg_random,
+          ctr_drbg->get()));
+    }
 
+    // mbedtls-3.5.2のDERの最大長を調べた。RSAの公開鍵のことを考慮しても
+    // 8192bytesあればPEMを格納できそうである。
+    //
+    // include/mbedtls/ecp.h
+    //   MBEDTLS_ECP_MAX_BYTES = 66
+    // library/pkwrite.h
+    //   MBEDTLS_PK_MAX_ECC_BYTES = MBEDTLS_ECP_MAX_BYTES = 66
+    //   MBEDTLS_PK_ECP_PUB_DER_MAX_BYTES = MBEDTLS_PK_MAX_ECC_BYTES * 2 + 30 = 162
+    //   MBEDTLS_PK_ECP_PRV_DER_MAX_BYTES = MBEDTLS_PK_MAX_ECC_BYTES * 3 + 29 = 227
+    //
+    // include/mbedtls/ecp.h
+    //   MBEDTLS_MPI_MAX_SIZE = 1024
+    // library/pkwrite.c
+    //   MBEDTLS_PK_RSA_PUB_DER_MAX_BYTES = MBEDTLS_MPI_MAX_SIZE * 2 + 38 = 2086
+    //   MBEDTLS_PK_RSA_PRV_DER_MAX_BYTES = MBEDTLS_MPI_MAX_SIZE * 5.5 + 48 = 5680
 
+    void impl_write_key_pem(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      std::vector<unsigned char> buffer(8192);
+      check(mbedtls_pk_write_key_pem(self->get(), buffer.data(), buffer.size()));
+      lua_pushstring(L, reinterpret_cast<const char*>(buffer.data()));
+    }
   }
 
   void initialize_pk(lua_State* L) {
@@ -66,6 +102,8 @@ namespace brigid {
       set_field(L, -1, "setup", function<impl_setup>());
       set_field(L, -1, "import_ec", function<impl_import_ec>());
       set_field(L, -1, "export_ec", function<impl_export_ec>());
+      set_field(L, -1, "parse_key", function<impl_parse_key>());
+      set_field(L, -1, "write_key_pem", function<impl_write_key_pem>());
 
       set_field(L, -1, "NONE", MBEDTLS_PK_NONE);
       set_field(L, -1, "RSA", MBEDTLS_PK_RSA);
