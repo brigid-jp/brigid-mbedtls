@@ -8,6 +8,8 @@
 #include <utility>
 
 namespace brigid {
+  bool runtime_error_policy_is_error(lua_State*);
+
   template <void (*T)(lua_State*)>
   struct function {
     static int value(lua_State* L) {
@@ -26,9 +28,13 @@ namespace brigid {
           return 1;
         }
       } catch (const std::runtime_error& e) {
-        lua_pushnil(L);
-        lua_pushstring(L, e.what());
-        return 2;
+        if (runtime_error_policy_is_error(L)) {
+          return luaL_error(L, "%s", e.what());
+        } else {
+          lua_pushnil(L);
+          lua_pushstring(L, e.what());
+          return 2;
+        }
       } catch (const std::exception& e) {
         return luaL_error(L, "%s", e.what());
       }

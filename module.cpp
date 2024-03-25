@@ -2,6 +2,7 @@
 #include <exception>
 
 namespace brigid {
+  void initialize_common(lua_State*);
   void initialize_base64(lua_State*);
   void initialize_ctr_drbg(lua_State*);
   void initialize_ecdh(lua_State*);
@@ -13,6 +14,7 @@ namespace brigid {
   void initialize_pk(lua_State*);
 
   void initialize(lua_State* L) {
+    initialize_common(L);
     initialize_base64(L);
     initialize_ctr_drbg(L);
     initialize_ecdh(L);
