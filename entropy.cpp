@@ -1,6 +1,5 @@
 #include "common.hpp"
 #include "entropy.hpp"
-
 #include <vector>
 
 namespace brigid {
@@ -16,7 +15,7 @@ namespace brigid {
       }
       std::vector<unsigned char> buffer(size);
       check(mbedtls_entropy_func(self->get(), buffer.data(), buffer.size()));
-      lua_pushlstring(L, reinterpret_cast<const char*>(buffer.data()), buffer.size());
+      push_string_reference(L, buffer);
     }
   }
 

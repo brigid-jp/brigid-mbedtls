@@ -1,5 +1,4 @@
 #include <lua.hpp>
-
 #include <exception>
 
 namespace brigid {

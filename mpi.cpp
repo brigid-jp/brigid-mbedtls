@@ -1,7 +1,5 @@
 #include "common.hpp"
 #include "mpi.hpp"
-
-#include <cstddef>
 #include <vector>
 
 namespace brigid {
@@ -20,9 +18,8 @@ namespace brigid {
 
     void impl_read_binary(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      std::size_t source_size = 0;
-      const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 2, &source_size));
-      check(mbedtls_mpi_read_binary(self->get(), source_data, source_size));
+      auto source = check_string_reference(L, 2);
+      check(mbedtls_mpi_read_binary(self->get(), source.data(), source.size()));
     }
 
     void impl_write_binary(lua_State* L) {
@@ -34,7 +31,7 @@ namespace brigid {
       }
       std::vector<unsigned char> buffer(size);
       check(mbedtls_mpi_write_binary(self->get(), buffer.data(), buffer.size()));
-      lua_pushlstring(L, reinterpret_cast<const char*>(buffer.data()), buffer.size());
+      push_string_reference(L, buffer);
     }
   }
 

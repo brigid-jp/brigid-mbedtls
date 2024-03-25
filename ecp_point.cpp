@@ -1,9 +1,8 @@
 #include "common.hpp"
 #include "ecp_group.hpp"
 #include "ecp_point.hpp"
-
 #include <cstddef>
-#include <vector>
+#include <array>
 
 namespace brigid {
   namespace {
@@ -13,7 +12,7 @@ namespace brigid {
       auto* self = self_t::check(L, 1);
       auto* group = ecp_group_t::check(L, 2);
       auto format = luaL_optinteger(L, 3, MBEDTLS_ECP_PF_UNCOMPRESSED);
-      std::vector<unsigned char> buffer(128);
+      std::array<unsigned char, 128> buffer;
       std::size_t buffer_size = 0;
       check(mbedtls_ecp_point_write_binary(
           group->get(),
@@ -22,19 +21,18 @@ namespace brigid {
           &buffer_size,
           buffer.data(),
           buffer.size()));
-      lua_pushlstring(L, reinterpret_cast<const char*>(buffer.data()), buffer_size);
+      push_string_reference(L, string_reference(buffer.data(), buffer_size));
     }
 
     void impl_read_binary(lua_State* L) {
       auto* self = self_t::check(L, 1);
       auto* group = ecp_group_t::check(L, 2);
-      std::size_t source_size = 0;
-      const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 3, &source_size));
+      auto source = check_string_reference(L, 3);
       check(mbedtls_ecp_point_read_binary(
           group->get(),
           self->get(),
-          source_data,
-          source_size));
+          source.data(),
+          source.size()));
     }
   }
 

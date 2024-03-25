@@ -1,5 +1,4 @@
 #include "common.hpp"
-
 #include <mbedtls/ecp.h>
 
 namespace brigid {

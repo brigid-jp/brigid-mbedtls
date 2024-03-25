@@ -1,7 +1,5 @@
 #include "common.hpp"
-
 #include <mbedtls/error.h>
-
 #include <array>
 
 namespace brigid {

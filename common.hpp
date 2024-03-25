@@ -37,9 +37,9 @@ namespace brigid {
 
   class string_reference {
   public:
-    string_reference(const char* data, std::size_t size) : data_(data), size_(size) {}
+    string_reference(const unsigned char* data, std::size_t size) : data_(data), size_(size) {}
 
-    const char* data() const {
+    const unsigned char* data() const {
       return data_;
     }
 
@@ -48,14 +48,19 @@ namespace brigid {
     }
 
   private:
-    const char* data_;
+    const unsigned char* data_;
     std::size_t size_;
   };
 
   inline string_reference check_string_reference(lua_State* L, int arg) {
     std::size_t size = 0;
-    const char* data = luaL_checklstring(L, arg, &size);
+    const auto* data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, arg, &size));
     return string_reference(data, size);
+  }
+
+  template <class T>
+  inline void push_string_reference(lua_State* L, const T& source) {
+    lua_pushlstring(L, reinterpret_cast<const char*>(source.data()), source.size());
   }
 
   template <class T, class... T_args>

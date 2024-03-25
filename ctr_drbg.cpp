@@ -1,7 +1,6 @@
 #include "common.hpp"
 #include "ctr_drbg.hpp"
 #include "entropy.hpp"
-
 #include <vector>
 
 namespace brigid {
@@ -11,8 +10,12 @@ namespace brigid {
     void impl_seed(lua_State* L) {
       auto* self = self_t::check(L, 1);
       auto* entropy = entropy_t::check(L, 2);
-      check(mbedtls_ctr_drbg_seed(self->get(), mbedtls_entropy_func, entropy->get(), nullptr, 0));
-
+      check(mbedtls_ctr_drbg_seed(
+          self->get(),
+          mbedtls_entropy_func,
+          entropy->get(),
+          nullptr,
+          0));
       if (!self->ref) {
         self->ref = thread_reference(L);
       }
@@ -31,7 +34,7 @@ namespace brigid {
       }
       std::vector<unsigned char> buffer(size);
       check(mbedtls_ctr_drbg_random(self->get(), buffer.data(), buffer.size()));
-      lua_pushlstring(L, reinterpret_cast<const char*>(buffer.data()), buffer.size());
+      push_string_reference(L, buffer);
     }
   }
 

@@ -2,11 +2,7 @@
 #include "ctr_drbg.hpp"
 #include "ecp_keypair.hpp"
 #include "pk.hpp"
-
-#include <mbedtls/base64.h>
-
-#include <cstddef>
-#include <vector>
+#include <array>
 
 namespace brigid {
   namespace {
@@ -48,13 +44,12 @@ namespace brigid {
 
     void impl_parse_key(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      std::size_t source_size = 0;
-      const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 2, &source_size));
+      auto source = check_string_reference(L, 2);
       auto* ctr_drbg = ctr_drbg_t::check(L, 3);
       check(mbedtls_pk_parse_key(
           self->get(),
-          source_data,
-          source_size + 1,
+          source.data(),
+          source.size() + 1,
           nullptr,
           0,
           mbedtls_ctr_drbg_random,
@@ -63,9 +58,11 @@ namespace brigid {
 
     void impl_parse_public_key(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      std::size_t source_size = 0;
-      const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 2, &source_size));
-      check(mbedtls_pk_parse_public_key(self->get(), source_data, source_size + 1));
+      auto source = check_string_reference(L, 2);
+      check(mbedtls_pk_parse_public_key(
+          self->get(),
+          source.data(),
+          source.size() + 1));
     }
 
     // mbedtls-3.5.2のDERの最大長を調べた。RSAの秘密鍵で4096bytes、公開鍵で
@@ -86,14 +83,14 @@ namespace brigid {
 
     void impl_write_key_pem(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      std::vector<unsigned char> buffer(4096);
+      std::array<unsigned char, 4096> buffer;
       check(mbedtls_pk_write_key_pem(self->get(), buffer.data(), buffer.size()));
       lua_pushstring(L, reinterpret_cast<const char*>(buffer.data()));
     }
 
     void impl_write_pubkey_pem(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      std::vector<unsigned char> buffer(8192);
+      std::array<unsigned char, 8192> buffer;
       check(mbedtls_pk_write_pubkey_pem(self->get(), buffer.data(), buffer.size()));
       lua_pushstring(L, reinterpret_cast<const char*>(buffer.data()));
     }

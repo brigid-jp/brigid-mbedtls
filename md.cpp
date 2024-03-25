@@ -1,7 +1,5 @@
 #include "common.hpp"
 #include "md.hpp"
-
-#include <cstddef>
 #include <vector>
 
 namespace brigid {
@@ -22,37 +20,36 @@ namespace brigid {
 
     void impl_update(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      std::size_t source_size = 0;
-      const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 2, &source_size));
-      check(mbedtls_md_update(self->get(), source_data, source_size));
+      auto source = check_string_reference(L, 2);
+      check(mbedtls_md_update(self->get(), source.data(), source.size()));
     }
 
     void impl_finish(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      std::vector<unsigned char> buffer(mbedtls_md_get_size(self->get()->MBEDTLS_PRIVATE(md_info)));
+      auto size = mbedtls_md_get_size(self->get()->MBEDTLS_PRIVATE(md_info));
+      std::vector<unsigned char> buffer(size);
       check(mbedtls_md_finish(self->get(), buffer.data()));
-      lua_pushlstring(L, reinterpret_cast<const char*>(buffer.data()), buffer.size());
+      push_string_reference(L, buffer);
     }
 
     void impl_hmac_starts(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      std::size_t source_size = 0;
-      const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 2, &source_size));
-      check(mbedtls_md_hmac_starts(self->get(), source_data, source_size));
+      auto source = check_string_reference(L, 2);
+      check(mbedtls_md_hmac_starts(self->get(), source.data(), source.size()));
     }
 
     void impl_hmac_update(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      std::size_t source_size = 0;
-      const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 2, &source_size));
-      check(mbedtls_md_hmac_update(self->get(), source_data, source_size));
+      auto source = check_string_reference(L, 2);
+      check(mbedtls_md_hmac_update(self->get(), source.data(), source.size()));
     }
 
     void impl_hmac_finish(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      std::vector<unsigned char> buffer(mbedtls_md_get_size(self->get()->MBEDTLS_PRIVATE(md_info)));
+      auto size = mbedtls_md_get_size(self->get()->MBEDTLS_PRIVATE(md_info));
+      std::vector<unsigned char> buffer(size);
       check(mbedtls_md_hmac_finish(self->get(), buffer.data()));
-      lua_pushlstring(L, reinterpret_cast<const char*>(buffer.data()), buffer.size());
+      push_string_reference(L, buffer);
     }
   }
 

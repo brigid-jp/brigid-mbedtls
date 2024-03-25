@@ -13,7 +13,11 @@ namespace brigid {
       auto* self = self_t::check(L, 1);
       auto group_id = static_cast<mbedtls_ecp_group_id>(luaL_checkinteger(L, 2));
       auto* ctr_drbg = ctr_drbg_t::check(L, 3);
-      check(mbedtls_ecp_gen_key(group_id, self->get(), mbedtls_ctr_drbg_random, ctr_drbg->get()));
+      check(mbedtls_ecp_gen_key(
+          group_id,
+          self->get(),
+          mbedtls_ctr_drbg_random,
+          ctr_drbg->get()));
     }
 
     void impl_set_group(lua_State* L) {
