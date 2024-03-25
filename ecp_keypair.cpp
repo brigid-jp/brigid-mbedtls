@@ -21,6 +21,12 @@ namespace brigid {
       check(mbedtls_ecp_group_copy(&self->get()->MBEDTLS_PRIVATE(grp), source->get()));
     }
 
+    void impl_get_group(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      auto* result = ecp_group_t::construct(L);
+      check(mbedtls_ecp_group_copy(result->get(), &self->get()->MBEDTLS_PRIVATE(grp)));
+    }
+
     void impl_set_public_key(lua_State* L) {
       auto* self = self_t::check(L, 1);
       auto* source = ecp_point_t::check(L, 2);
@@ -49,6 +55,7 @@ namespace brigid {
 
       set_field(L, -1, "gen_key", function<impl_gen_key>());
       set_field(L, -1, "set_group", function<impl_set_group>());
+      set_field(L, -1, "get_group", function<impl_get_group>());
       set_field(L, -1, "set_public_key", function<impl_set_public_key>());
       set_field(L, -1, "get_public_key", function<impl_get_public_key>());
     }
