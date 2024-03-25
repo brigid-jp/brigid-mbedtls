@@ -25,7 +25,7 @@ namespace brigid {
 
     void impl_calc_secret(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto* ctr_drbg = ctr_drbg_t::check(L, 3);
+      auto* ctr_drbg = ctr_drbg_t::check(L, 2);
       std::vector<unsigned char> buffer(128);
       std::size_t buffer_size = 0;
       check(mbedtls_ecdh_calc_secret(self->get(), &buffer_size, buffer.data(), buffer.size(), mbedtls_ctr_drbg_random, ctr_drbg->get()));

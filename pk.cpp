@@ -61,6 +61,13 @@ namespace brigid {
           ctr_drbg->get()));
     }
 
+    void impl_parse_public_key(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      std::size_t source_size = 0;
+      const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 2, &source_size));
+      check(mbedtls_pk_parse_public_key(self->get(), source_data, source_size + 1));
+    }
+
     // mbedtls-3.5.2のDERの最大長を調べた。RSAの秘密鍵で4096bytes、公開鍵で
     // 8192bytesあればPEMを格納できそうである。
     //
@@ -109,6 +116,7 @@ namespace brigid {
       set_field(L, -1, "set_ec", function<impl_set_ec>());
       set_field(L, -1, "get_ec", function<impl_get_ec>());
       set_field(L, -1, "parse_key", function<impl_parse_key>());
+      set_field(L, -1, "parse_public_key", function<impl_parse_public_key>());
       set_field(L, -1, "write_key_pem", function<impl_write_key_pem>());
       set_field(L, -1, "write_pubkey_pem", function<impl_write_pubkey_pem>());
 
