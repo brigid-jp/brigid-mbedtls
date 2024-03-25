@@ -44,5 +44,5 @@ local r = assert(mbedtls.mpi():read_binary(r_bin))
 local s = assert(mbedtls.mpi():read_binary(s_bin))
 assert(mbedtls.ecdsa.verify(group, hash_bin, pk:get_ec():get_public_key(), r, s))
 
-local r, s = assert(mbedtls.ecdsa.sign_det_ext(group, pk:get_ec():get_key(), hash_bin, 0x09, ctr_drbg))
+local r, s = assert(mbedtls.ecdsa.sign_det_ext(group, pk:get_ec():get_key(), hash_bin, mbedtls.md.SHA256, ctr_drbg))
 assert(mbedtls.ecdsa.verify(group, hash_bin, pk:get_ec():get_public_key(), r, s))
