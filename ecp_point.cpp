@@ -22,13 +22,14 @@ namespace brigid {
           &buffer_size,
           buffer.data(),
           buffer.size()));
+      lua_pushlstring(L, reinterpret_cast<const char*>(buffer.data()), buffer_size);
     }
 
     void impl_read_binary(lua_State* L) {
       auto* self = self_t::check(L, 1);
       auto* group = ecp_group_t::check(L, 2);
       std::size_t source_size = 0;
-      const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 2, &source_size));
+      const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 3, &source_size));
       check(mbedtls_ecp_point_read_binary(
           group->get(),
           self->get(),
