@@ -1,9 +1,59 @@
 #include "common.hpp"
 #include "md.hpp"
 
+#include <cstddef>
+#include <vector>
+
 namespace brigid {
   namespace {
     using self_t = md_t;
+
+    void impl_setup(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      auto type = static_cast<mbedtls_md_type_t>(luaL_checkinteger(L, 2));
+      auto hmac = lua_toboolean(L, 3);
+      check(mbedtls_md_setup(self->get(), mbedtls_md_info_from_type(type), hmac));
+    }
+
+    void impl_starts(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      check(mbedtls_md_starts(self->get()));
+    }
+
+    void impl_update(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      std::size_t source_size = 0;
+      const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 2, &source_size));
+      check(mbedtls_md_update(self->get(), source_data, source_size));
+    }
+
+    void impl_finish(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      std::vector<unsigned char> buffer(mbedtls_md_get_size(self->get()->MBEDTLS_PRIVATE(md_info)));
+      check(mbedtls_md_finish(self->get(), buffer.data()));
+      lua_pushlstring(L, reinterpret_cast<const char*>(buffer.data()), buffer.size());
+    }
+
+    void impl_hmac_starts(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      std::size_t source_size = 0;
+      const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 2, &source_size));
+      check(mbedtls_md_hmac_starts(self->get(), source_data, source_size));
+    }
+
+    void impl_hmac_update(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      std::size_t source_size = 0;
+      const auto* source_data = reinterpret_cast<const unsigned char*>(luaL_checklstring(L, 2, &source_size));
+      check(mbedtls_md_hmac_update(self->get(), source_data, source_size));
+    }
+
+    void impl_hmac_finish(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      std::vector<unsigned char> buffer(mbedtls_md_get_size(self->get()->MBEDTLS_PRIVATE(md_info)));
+      check(mbedtls_md_hmac_finish(self->get(), buffer.data()));
+      lua_pushlstring(L, reinterpret_cast<const char*>(buffer.data()), buffer.size());
+    }
   }
 
   void initialize_md(lua_State* L) {
@@ -18,6 +68,14 @@ namespace brigid {
       lua_newtable(L);
       set_field(L, -1, "__call", self_t::constructor());
       lua_setmetatable(L, -2);
+
+      set_field(L, -1, "setup", function<impl_setup>());
+      set_field(L, -1, "starts", function<impl_starts>());
+      set_field(L, -1, "update", function<impl_update>());
+      set_field(L, -1, "finish", function<impl_finish>());
+      set_field(L, -1, "hmac_starts", function<impl_hmac_starts>());
+      set_field(L, -1, "hmac_update", function<impl_hmac_update>());
+      set_field(L, -1, "hmac_finish", function<impl_hmac_finish>());
 
       set_field(L, -1, "NONE", MBEDTLS_MD_NONE);
       set_field(L, -1, "MD5", MBEDTLS_MD_MD5);
