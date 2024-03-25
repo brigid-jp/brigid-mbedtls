@@ -4,12 +4,12 @@ local debug = (tonumber(os.getenv "BRIGID_DEBUG") or 0) > 0
 
 do
   local pk = mbedtls.pk()
-  local result, message = pk:setup(-1)
+  local result, message = pk:setup(mbedtls.pk.NONE)
   if debug then
     print(message)
   end
   assert(not result)
-  assert(pk:setup(pk.ECKEY))
+  assert(pk:setup(mbedtls.pk.ECKEY))
 end
 
 -- openssl ecparam -genkey -name prime256v1 -noout

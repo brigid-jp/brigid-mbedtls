@@ -4,6 +4,12 @@
 namespace brigid {
   namespace {
     using self_t = ecp_group_t;
+
+    void impl_load(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      auto group_id = static_cast<mbedtls_ecp_group_id>(luaL_checkinteger(L, 2));
+      check(mbedtls_ecp_group_load(self->get(), group_id));
+    }
   }
 
   void initialize_ecp_group(lua_State* L) {
@@ -18,6 +24,8 @@ namespace brigid {
       lua_newtable(L);
       set_field(L, -1, "__call", self_t::constructor());
       lua_setmetatable(L, -2);
+
+      set_field(L, -1, "load", function<impl_load>());
     }
     lua_setfield(L, -2, "group");
   }

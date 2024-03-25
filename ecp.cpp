@@ -7,10 +7,10 @@
 namespace brigid {
   namespace {
     void impl_gen_key(lua_State* L) {
-      auto group_id = luaL_checkinteger(L, 1);
+      auto group_id = static_cast<mbedtls_ecp_group_id>(luaL_checkinteger(L, 1));
       auto* ctr_drbg = ctr_drbg_t::check(L, 2);
       auto* result = ecp_keypair_t::construct(L);
-      check(mbedtls_ecp_gen_key(static_cast<mbedtls_ecp_group_id>(group_id), result->get(), mbedtls_ctr_drbg_random, ctr_drbg->get()));
+      check(mbedtls_ecp_gen_key(group_id, result->get(), mbedtls_ctr_drbg_random, ctr_drbg->get()));
     }
   }
 
