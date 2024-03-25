@@ -13,19 +13,25 @@ do
 end
 
 -- openssl ecparam -genkey -name prime256v1 -noout
-local pem = [[
+local key_pem = [[
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIKeXFaquwlyZKLfa+SP7M3q1wFdwz+6ISQQSIEOOtFwloAoGCCqGSM49
-AwEHoUQDQgAEr7DTr1DLQTI1Fcr9rChEERuW8Eq8d6Y9grAn2v/ZZ5uxcrSsUwxf
-onv1V9J1mS5ZteURWe7rFZAco7zuKTWIRA==
+MHcCAQEEII7NAJCFPZZP6aLyblWg2kXD1tfRgPSjAWr8eqpYzKH8oAoGCCqGSM49
+AwEHoUQDQgAE8xGMev+n8tdsj7S3yLkWYy84J5DYbh/cS6zrRM+c1x38WCfd2RMO
+SDM4EkWx84hiV/HcVV5aLyeQF5pmTEsvoA==
 -----END EC PRIVATE KEY-----
 ]]
+
+-- openssl ec -pubout <key.pem
+local pubkey_pem = [[
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8xGMev+n8tdsj7S3yLkWYy84J5DY
+bh/cS6zrRM+c1x38WCfd2RMOSDM4EkWx84hiV/HcVV5aLyeQF5pmTEsvoA==
+-----END PUBLIC KEY-----
+]]
+
 local pk = mbedtls.pk()
 local entropy = mbedtls.entropy()
 local ctr_drbg = mbedtls.ctr_drbg():seed(entropy)
-assert(pk:parse_key(pem, ctr_drbg))
-print(pk:write_key_pem())
-print(pk:write_pubkey_pem())
-
-
-
+assert(pk:parse_key(key_pem, ctr_drbg))
+assert(pk:write_key_pem() == key_pem)
+assert(pk:write_pubkey_pem() == pubkey_pem)
