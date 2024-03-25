@@ -25,3 +25,7 @@ local entropy = mbedtls.entropy()
 local ctr_drbg = mbedtls.ctr_drbg():seed(entropy)
 assert(pk:parse_key(pem, ctr_drbg))
 print(pk:write_key_pem())
+print(pk:write_pubkey_pem())
+
+
+
