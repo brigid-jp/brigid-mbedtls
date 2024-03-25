@@ -5,8 +5,6 @@
 #include <mbedtls/ecp.h>
 
 namespace brigid {
-  void initialize_ecp_keypair(lua_State*);
-
   namespace {
     void impl_gen_key(lua_State* L) {
       auto group_id = luaL_checkinteger(L, 1);
@@ -16,10 +14,14 @@ namespace brigid {
     }
   }
 
+  void initialize_ecp_keypair(lua_State*);
+  void initialize_ecp_point(lua_State*);
+
   void initialize_ecp(lua_State* L) {
     lua_newtable(L);
     {
       initialize_ecp_keypair(L);
+      initialize_ecp_point(L);
 
       set_field(L, -1, "gen_key", function<impl_gen_key>());
 

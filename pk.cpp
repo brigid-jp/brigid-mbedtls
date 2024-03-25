@@ -17,32 +17,32 @@ namespace brigid {
       check(mbedtls_pk_setup(self->get(), mbedtls_pk_info_from_type(info_type)));
     }
 
-    void impl_import_ec(lua_State* L) {
+    void impl_set_ec(lua_State* L) {
       auto* self = self_t::check(L, 1);
       auto* source = ecp_keypair_t::check(L, 2);
-      auto* target = mbedtls_pk_ec(*self->get());
-      if (!target) {
+      auto* result = mbedtls_pk_ec(*self->get());
+      if (!result) {
         luaL_argerror(L, 1, "EC context missing in the PK context");
       }
       check(mbedtls_ecp_export(
           source->get(),
-          &target->MBEDTLS_PRIVATE(grp),
-          &target->MBEDTLS_PRIVATE(d),
-          &target->MBEDTLS_PRIVATE(Q)));
+          &result->MBEDTLS_PRIVATE(grp),
+          &result->MBEDTLS_PRIVATE(d),
+          &result->MBEDTLS_PRIVATE(Q)));
     }
 
-    void impl_export_ec(lua_State* L) {
+    void impl_get_ec(lua_State* L) {
       auto* self = self_t::check(L, 1);
       auto* source = mbedtls_pk_ec(*self->get());
       if (!source) {
         luaL_argerror(L, 1, "EC context missing in the PK context");
       }
-      auto* target = ecp_keypair_t::construct(L);
+      auto* result = ecp_keypair_t::construct(L);
       check(mbedtls_ecp_export(
           source,
-          &target->get()->MBEDTLS_PRIVATE(grp),
-          &target->get()->MBEDTLS_PRIVATE(d),
-          &target->get()->MBEDTLS_PRIVATE(Q)));
+          &result->get()->MBEDTLS_PRIVATE(grp),
+          &result->get()->MBEDTLS_PRIVATE(d),
+          &result->get()->MBEDTLS_PRIVATE(Q)));
     }
 
     void impl_parse_key(lua_State* L) {
@@ -105,8 +105,8 @@ namespace brigid {
       lua_setmetatable(L, -2);
 
       set_field(L, -1, "setup", function<impl_setup>());
-      set_field(L, -1, "import_ec", function<impl_import_ec>());
-      set_field(L, -1, "export_ec", function<impl_export_ec>());
+      set_field(L, -1, "set_ec", function<impl_set_ec>());
+      set_field(L, -1, "get_ec", function<impl_get_ec>());
       set_field(L, -1, "parse_key", function<impl_parse_key>());
       set_field(L, -1, "write_key_pem", function<impl_write_key_pem>());
       set_field(L, -1, "write_pubkey_pem", function<impl_write_pubkey_pem>());

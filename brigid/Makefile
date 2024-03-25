@@ -11,6 +11,7 @@ OBJS = \
 	ctr_drbg.o \
 	ecp.o \
 	ecp_keypair.o \
+	ecp_point.o \
 	entropy.o \
 	pk.o \
 	module.o
