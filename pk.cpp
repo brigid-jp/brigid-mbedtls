@@ -5,6 +5,7 @@
 
 #include <mbedtls/base64.h>
 
+#include <cstddef>
 #include <vector>
 
 namespace brigid {
