@@ -5,7 +5,11 @@
 #include <mbedtls/md.h>
 
 namespace brigid {
-  class md_t : public context<md_t, mbedtls_md_context_t, mbedtls_md_init, mbedtls_md_free> {
+  class md_t : public context<
+    md_t,
+    mbedtls_md_context_t,
+    mbedtls_md_init,
+    mbedtls_md_free> {
   public:
     static constexpr const char* name = "brigid.mbedtls.md";
   };

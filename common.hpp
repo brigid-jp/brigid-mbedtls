@@ -2,7 +2,7 @@
 #define BRIGID_MBEDTLS_COMMON_HPP
 
 #include <lua.hpp>
-
+#include <cstddef>
 #include <new>
 #include <stdexcept>
 #include <utility>
@@ -12,9 +12,9 @@ namespace brigid {
   struct function {
     static int value(lua_State* L) {
       try {
-        int top = lua_gettop(L);
+        auto top = lua_gettop(L);
         T(L);
-        int result = lua_gettop(L) - top;
+        auto result = lua_gettop(L) - top;
         if (result > 0) {
           return result;
         } else {
@@ -34,6 +34,29 @@ namespace brigid {
       }
     }
   };
+
+  class string_reference {
+  public:
+    string_reference(const char* data, std::size_t size) : data_(data), size_(size) {}
+
+    const char* data() const {
+      return data_;
+    }
+
+    std::size_t size() const {
+      return size_;
+    }
+
+  private:
+    const char* data_;
+    std::size_t size_;
+  };
+
+  inline string_reference check_string_reference(lua_State* L, int arg) {
+    std::size_t size = 0;
+    const char* data = luaL_checklstring(L, arg, &size);
+    return string_reference(data, size);
+  }
 
   template <class T, class... T_args>
   inline T* new_userdata(lua_State* L, const char* name, T_args... args) {

@@ -5,7 +5,11 @@
 #include <mbedtls/ecdh.h>
 
 namespace brigid {
-  class ecdh_t : public context<ecdh_t, mbedtls_ecdh_context, mbedtls_ecdh_init, mbedtls_ecdh_free> {
+  class ecdh_t : public context<
+    ecdh_t,
+    mbedtls_ecdh_context,
+    mbedtls_ecdh_init,
+    mbedtls_ecdh_free> {
   public:
     static constexpr const char* name = "brigid.mbedtls.ecdh";
   };

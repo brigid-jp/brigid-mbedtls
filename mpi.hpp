@@ -5,7 +5,11 @@
 #include <mbedtls/bignum.h>
 
 namespace brigid {
-  class mpi_t : public context<mpi_t, mbedtls_mpi, mbedtls_mpi_init, mbedtls_mpi_free> {
+  class mpi_t : public context<
+    mpi_t,
+    mbedtls_mpi,
+    mbedtls_mpi_init,
+    mbedtls_mpi_free> {
   public:
     static constexpr const char* name = "brigid.mbedtls.mpi";
   };
