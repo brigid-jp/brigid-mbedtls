@@ -1,6 +1,6 @@
 CXXFLAGS += -Wall -W -std=c++11 $(CFLAGS)
 CPPFLAGS += -I../mbedtls/include -I$(LUA_INCDIR) -MMD
-LDFLAGS += -L../mbedtls/library $(LIBFLAG) 
+LDFLAGS += -L../mbedtls/library $(LIBFLAG)
 LDLIBS += -lmbedcrypto
 
 VPATH = ..

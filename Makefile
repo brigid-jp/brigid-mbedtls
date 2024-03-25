@@ -1,11 +1,13 @@
+export CFLAGS LIBFLAG LUA_INCDIR LIBDIR
+
 all:
-	$(MAKE) -e -C brigid all
+	$(MAKE) -C brigid all
 
 clean:
-	$(MAKE) -e -C brigid clean
+	$(MAKE) -C brigid clean
 
 check:
 	./test.sh
 
 install:
-	$(MAKE) -e -C brigid install
+	$(MAKE) -C brigid install
