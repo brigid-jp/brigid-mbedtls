@@ -1,29 +1,17 @@
 local mbedtls = require "brigid.mbedtls"
+mbedtls.set_runtime_error_policy "error"
+local test = require "test"
 
-local debug = (tonumber(os.getenv "BRIGID_DEBUG") or 0) > 0
+local hash = mbedtls.md()
+  :setup(mbedtls.md.SHA256)
+  :starts()
+  :update(test.sha256.message)
+  :finish()
+assert(hash == test.sha256.hash)
 
--- printf 'Hello World!' | openssl dgst -sha256 -binary | xxd -i -c 8
-local hash_bin = string.char(
-  0x7f, 0x83, 0xb1, 0x65, 0x7f, 0xf1, 0xfc, 0x53,
-  0xb9, 0x2d, 0xc1, 0x81, 0x48, 0xa1, 0xd6, 0x5d,
-  0xfc, 0x2d, 0x4b, 0x1f, 0xa3, 0xd6, 0x77, 0x28,
-  0x4a, 0xdd, 0xd2, 0x00, 0x12, 0x6d, 0x90, 0x69
-)
-
--- printf 'Hello World!' | openssl dgst -sha256 -hmac secret -binary | xxd -i -c 8
-local hmac_bin = string.char(
-  0x6f, 0xa7, 0xb4, 0xde, 0xa2, 0x8e, 0xe3, 0x48,
-  0xdf, 0x10, 0xf9, 0xbb, 0x59, 0x5a, 0xd9, 0x85,
-  0xff, 0x15, 0x0a, 0x4a, 0xdf, 0xd6, 0x13, 0x1c,
-  0xca, 0x67, 0x7d, 0x9a, 0xce, 0xe0, 0x7d, 0xc6
-)
-
-local md = assert(mbedtls.md():setup(mbedtls.md.SHA256))
-md:starts()
-md:update "Hello World!"
-assert(md:finish() == hash_bin)
-
-local md = assert(mbedtls.md():setup(mbedtls.md.SHA256, true))
-md:hmac_starts "secret"
-md:hmac_update "Hello World!"
-assert(md:hmac_finish() == hmac_bin)
+local hmac = mbedtls.md()
+  :setup(mbedtls.md.SHA256, true)
+  :hmac_starts(test.sha256.secret)
+  :hmac_update(test.sha256.message)
+  :hmac_finish()
+assert(hmac == test.sha256.hmac)
