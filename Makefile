@@ -18,4 +18,6 @@ archive:
 	./archive.sh
 
 $(DEPEND):
+	touch mbedtls/library/psa_crypto_driver_wrappers.h
+	touch mbedtls/library/psa_crypto_driver_wrappers_no_static.c
 	$(MAKE) -C mbedtls -j 8 lib
