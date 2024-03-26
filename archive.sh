@@ -10,4 +10,5 @@ prefix=brigid-mbedtls-$version
 
 git archive --prefix "$prefix/" HEAD | (cd brigid && tar xf -)
 (cd mbedtls && git archive --prefix "$prefix/mbedtls/" HEAD) | (cd brigid && tar xf -)
-# (cd "brigid/$prefix/mbedtls/tests" && rm -fr data_files suites)
+(cd "brigid/$prefix/mbedtls/tests" && rm -fr data_files opt-testcases suites)
+(cd brigid && tar caf "$prefix.tar.gz" "$prefix")
