@@ -1,5 +1,5 @@
-export CFLAGS LIBFLAG LUA_INCDIR LIBDIR
-
+export CFLAGS ROCK_CFLAGS ROCK_LIBFLAG ROCK_LUA_INCDIR ROCK_LIBDIR
+CFLAGS = -std=c99 $(ROCK_CFLAGS)
 DEPEND = mbedtls/library/libmbedcrypto.a
 
 all: $(DEPEND)
@@ -14,7 +14,7 @@ check:
 install:
 	$(MAKE) -C brigid install
 
-dist:
+archive:
 	./archive.sh
 
 $(DEPEND):

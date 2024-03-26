@@ -12,11 +12,11 @@ description = {
 build = {
   type = "make";
   build_variables = {
-    CFLAGS = "$(CFLAGS)";
-    LIBFLAG = "$(LIBFLAG)";
-    LUA_INCDIR = "$(LUA_INCDIR)";
+    ROCK_CFLAGS = "$(CFLAGS)";
+    ROCK_LIBFLAG = "$(LIBFLAG)";
+    ROCK_LUA_INCDIR = "$(LUA_INCDIR)";
   };
   install_variables = {
-    LIBDIR = "$(LIBDIR)";
+    ROCK_LIBDIR = "$(LIBDIR)";
   };
 }

@@ -1,6 +1,6 @@
-CXXFLAGS += -Wall -W -std=c++11 $(CFLAGS)
-CPPFLAGS += -I../mbedtls/include -I$(LUA_INCDIR) -MMD
-LDFLAGS += -L../mbedtls/library $(LIBFLAG)
+CXXFLAGS += -Wall -W -std=c++11 $(ROCK_CFLAGS)
+CPPFLAGS += -I../mbedtls/include -I$(ROCK_LUA_INCDIR) -MMD
+LDFLAGS += -L../mbedtls/library $(ROCK_LIBFLAG)
 LDLIBS += -lmbedcrypto
 
 VPATH = ..
@@ -30,8 +30,8 @@ clean:
 	rm -f *.d *.o $(TARGET)
 
 install:
-	mkdir -p $(LIBDIR)/brigid
-	cp $(TARGET) $(LIBDIR)/brigid
+	mkdir -p $(ROCK_LIBDIR)/brigid
+	cp $(TARGET) $(ROCK_LIBDIR)/brigid
 
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
