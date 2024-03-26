@@ -17,3 +17,5 @@ install:
 $(DEPEND):
 	$(MAKE) -C mbedtls -j 8 lib
 
+archive:
+	./archive.sh
