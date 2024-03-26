@@ -119,12 +119,12 @@ namespace brigid {
       ref_ = luaL_ref(L, LUA_REGISTRYINDEX);
     }
 
-    ~thread_reference() {
-      unref();
-    }
-
     thread_reference(thread_reference&& that) : thread_(that.thread_), ref_(that.ref_) {
       that.reset();
+    }
+
+    ~thread_reference() {
+      unref();
     }
 
     thread_reference& operator=(thread_reference&& that) {
