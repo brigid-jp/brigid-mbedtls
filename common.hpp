@@ -112,15 +112,15 @@ namespace brigid {
     thread_reference(const thread_reference&) = delete;
     thread_reference& operator=(const thread_reference&) = delete;
 
-    thread_reference() = default;
+    thread_reference() : thread_(), ref_(LUA_NOREF) {}
+
+    explicit thread_reference(lua_State* L) : thread_(), ref_(LUA_NOREF) {
+      thread_ = lua_newthread(L);
+      ref_ = luaL_ref(L, LUA_REGISTRYINDEX);
+    }
 
     ~thread_reference() {
       unref();
-    }
-
-    explicit thread_reference(lua_State* L) {
-      thread_ = lua_newthread(L);
-      ref_ = luaL_ref(L, LUA_REGISTRYINDEX);
     }
 
     thread_reference(thread_reference&& that) : thread_(that.thread_), ref_(that.ref_) {
@@ -146,8 +146,8 @@ namespace brigid {
     }
 
   private:
-    lua_State* thread_ = nullptr;;
-    int ref_ = LUA_NOREF;
+    lua_State* thread_;
+    int ref_;
 
     void reset() {
       thread_ = nullptr;
@@ -168,7 +168,7 @@ namespace brigid {
     context(const context&) = delete;
     context& operator=(const context&) = delete;
 
-    context() {
+    context() : context_() {
       T_init(&context_);
     }
 
@@ -200,7 +200,7 @@ namespace brigid {
     using destructor = function<impl_destructor>;
 
   private:
-    T_context context_ = {};
+    T_context context_;
   };
 
   void check(int);
