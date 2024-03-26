@@ -21,6 +21,7 @@ namespace brigid {
       new_curve_info(L, mbedtls_ecp_curve_info_from_grp_id(grp_id));
     }
 
+    // https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-8
     void impl_curve_info_from_tls_id(lua_State* L) {
       auto tls_id = luaL_checkinteger(L, 1);
       new_curve_info(L, mbedtls_ecp_curve_info_from_tls_id(tls_id));

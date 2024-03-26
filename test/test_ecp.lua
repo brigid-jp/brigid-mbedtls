@@ -1,84 +1,61 @@
 local mbedtls = require "brigid.mbedtls"
+mbedtls.set_runtime_error_policy "error"
+local test = require "test"
 
-local debug = (tonumber(os.getenv "BRIGID_DEBUG") or 0) > 0
+local ctr_drbg = mbedtls.ctr_drbg():seed(mbedtls.entropy())
 
-local entropy = mbedtls.entropy()
-local ctr_drbg = mbedtls.ctr_drbg():seed(entropy)
-
-do
-  local group = mbedtls.ecp.group()
-  local result, message = group:load(mbedtls.ecp.DP_NONE)
-  if debug then
-    print(message)
-  end
-  assert(not result)
-  assert(group:load(mbedtls.ecp.DP_SECP256R1))
-
-  local info = assert(mbedtls.ecp.curve_info_from_grp_id(group:get_id()))
-  if debug then
-    print(info.grp_id)
-    print(info.tls_id)
-    print(info.bit_size)
-    print(info.name)
+local function debug_print_curve_info(info)
+  if test.debug then
+    print("grp_id: "..info.grp_id)
+    print("tls_id: "..info.tls_id)
+    print("bit_size: "..info.bit_size)
+    print("name: "..info.name)
   end
 end
 
-do
-  local keypair = mbedtls.ecp.keypair()
-  keypair:gen_key(mbedtls.ecp.DP_SECP256R1, ctr_drbg)
+local info = mbedtls.ecp.curve_info_from_grp_id(mbedtls.ecp.DP_SECP256R1)
+debug_print_curve_info(info)
 
-  local pk = mbedtls.pk()
-  assert(pk:setup(mbedtls.pk.ECKEY))
-  assert(pk:set_ec(keypair))
+assert(info.grp_id == mbedtls.ecp.DP_SECP256R1)
+assert(info.tls_id == 23)
+assert(info.bit_size == 256)
+assert(info.name == "secp256r1")
 
-  local key_pem = assert(pk:write_key_pem())
-  local pubkey_pem = assert(pk:write_pubkey_pem())
+local info = mbedtls.ecp.curve_info_from_tls_id(25)
+debug_print_curve_info(info)
+assert(info.grp_id == mbedtls.ecp.DP_SECP521R1)
+assert(info.tls_id == 25)
+assert(info.bit_size == 521)
+assert(info.name == "secp521r1")
 
-  if debug then
-    io.write(key_pem)
-    io.write(pubkey_pem)
-  end
+local info = mbedtls.ecp.curve_info_from_name "x25519"
+debug_print_curve_info(info)
+assert(info.grp_id == mbedtls.ecp.DP_CURVE25519)
+assert(info.tls_id == 29)
+assert(info.bit_size == 256)
+assert(info.name == "x25519")
+
+local group = mbedtls.ecp.group():load(mbedtls.ecp.DP_SECP256R1)
+assert(group:get_id() == mbedtls.ecp.DP_SECP256R1)
+
+local keypair = mbedtls.ecp.keypair():gen_key(mbedtls.ecp.DP_SECP256R1, ctr_drbg)
+local pk = mbedtls.pk():setup(mbedtls.pk.ECKEY):set_ec(keypair)
+local key_pem = pk:write_key_pem()
+local pub_pem = pk:write_pubkey_pem()
+if test.debug then
+  io.write(key_pem, pub_pem)
 end
 
--- openssl ec -pubout <key1.pem >pubkey1.pem
-local pubkey_pem = [[
------BEGIN PUBLIC KEY-----
-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8xGMev+n8tdsj7S3yLkWYy84J5DY
-bh/cS6zrRM+c1x38WCfd2RMOSDM4EkWx84hiV/HcVV5aLyeQF5pmTEsvoA==
------END PUBLIC KEY-----
-]]
+local pub = mbedtls.ecp.point():read_binary(group, test.secp256r1_1.pub_bin)
+assert(pub:write_binary(group) == test.secp256r1_1.pub_bin)
+local keypair = mbedtls.ecp.keypair():set_group(group):set_public_key(pub)
+local pk = mbedtls.pk():setup(mbedtls.pk.ECKEY):set_ec(keypair)
+assert(pk:write_pubkey_pem() == test.secp256r1_1.pub_pem)
 
--- openssl pkey -pubin -outform der <pubkey1.pem | tail -b 65 | xxd -i -c 8
-local pubkey_bin = string.char(
-  0x04, 0xf3, 0x11, 0x8c, 0x7a, 0xff, 0xa7, 0xf2,
-  0xd7, 0x6c, 0x8f, 0xb4, 0xb7, 0xc8, 0xb9, 0x16,
-  0x63, 0x2f, 0x38, 0x27, 0x90, 0xd8, 0x6e, 0x1f,
-  0xdc, 0x4b, 0xac, 0xeb, 0x44, 0xcf, 0x9c, 0xd7,
-  0x1d, 0xfc, 0x58, 0x27, 0xdd, 0xd9, 0x13, 0x0e,
-  0x48, 0x33, 0x38, 0x12, 0x45, 0xb1, 0xf3, 0x88,
-  0x62, 0x57, 0xf1, 0xdc, 0x55, 0x5e, 0x5a, 0x2f,
-  0x27, 0x90, 0x17, 0x9a, 0x66, 0x4c, 0x4b, 0x2f,
-  0xa0
-);
-
-do
-  local group = mbedtls.ecp.group():load(mbedtls.ecp.DP_SECP256R1)
-  local q = mbedtls.ecp.point()
-  local result, message = q:read_binary(group, pubkey_bin:sub(2))
-  if debug then
-    print(message)
-  end
-  assert(not result)
-  assert(q:read_binary(group, pubkey_bin))
-  assert(q:write_binary(group) == pubkey_bin)
-
-  local keypair = mbedtls.ecp.keypair()
-  assert(keypair:set_group(group))
-  assert(keypair:set_public_key(q))
-  assert(keypair:get_public_key():write_binary(group) == pubkey_bin)
-
-  local pk = mbedtls.pk()
-  assert(pk:setup(mbedtls.pk.ECKEY))
-  assert(pk:set_ec(keypair))
-  assert(pk:write_pubkey_pem() == pubkey_pem)
-end
+local key = mbedtls.mpi():read_binary(test.secp256r1_1.key_bin)
+assert(key:bitlen() == 256)
+assert(key:size() == 32)
+assert(key:write_binary(32) == test.secp256r1_1.key_bin)
+pk:set_ec(keypair:set_key(key))
+assert(pk:write_key_pem() == test.secp256r1_1.key_pem)
+assert(pk:write_pubkey_pem() == test.secp256r1_1.pub_pem)
