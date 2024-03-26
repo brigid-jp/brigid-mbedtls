@@ -6,30 +6,30 @@
 namespace brigid {
   namespace {
     void impl_encode(lua_State* L) {
-      auto source = check_string_reference(L, 1);
+      auto input = check_string_reference(L, 1);
       // 1byte余分に必要
-      std::vector<unsigned char> buffer((source.size() + 2) / 3 * 4 + 1);
-      std::size_t buffer_size = 0;
+      std::vector<unsigned char> output((input.size() + 2) / 3 * 4 + 1);
+      std::size_t output_size = 0;
       check(mbedtls_base64_encode(
-          buffer.data(),
-          buffer.size(),
-          &buffer_size,
-          source.data(),
-          source.size()));
-      push_string_reference(L, string_reference(buffer.data(), buffer_size));
+          output.data(),
+          output.size(),
+          &output_size,
+          input.data(),
+          input.size()));
+      push_string_reference(L, string_reference(output.data(), output_size));
     }
 
     void impl_decode(lua_State* L) {
-      auto source = check_string_reference(L, 1);
-      std::vector<unsigned char> buffer((source.size() + 3) / 4 * 3);
-      std::size_t buffer_size = 0;
+      auto input = check_string_reference(L, 1);
+      std::vector<unsigned char> output((input.size() + 3) / 4 * 3);
+      std::size_t output_size = 0;
       check(mbedtls_base64_decode(
-          buffer.data(),
-          buffer.size(),
-          &buffer_size,
-          source.data(),
-          source.size()));
-      push_string_reference(L, string_reference(buffer.data(), buffer_size));
+          output.data(),
+          output.size(),
+          &output_size,
+          input.data(),
+          input.size()));
+      push_string_reference(L, string_reference(output.data(), output_size));
     }
   }
 

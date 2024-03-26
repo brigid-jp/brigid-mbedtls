@@ -16,12 +16,6 @@ namespace brigid {
       lua_pushinteger(L, mbedtls_mpi_size(self->get()));
     }
 
-    void impl_read_binary(lua_State* L) {
-      auto* self = self_t::check(L, 1);
-      auto source = check_string_reference(L, 2);
-      check(mbedtls_mpi_read_binary(self->get(), source.data(), source.size()));
-    }
-
     void impl_write_binary(lua_State* L) {
       auto* self = self_t::check(L, 1);
       auto size = luaL_checkinteger(L, 2);
@@ -29,9 +23,15 @@ namespace brigid {
         luaL_argerror(L, 2, "out of bounds");
         return;
       }
-      std::vector<unsigned char> buffer(size);
-      check(mbedtls_mpi_write_binary(self->get(), buffer.data(), buffer.size()));
-      push_string_reference(L, buffer);
+      std::vector<unsigned char> output(size);
+      check(mbedtls_mpi_write_binary(self->get(), output.data(), output.size()));
+      push_string_reference(L, output);
+    }
+
+    void impl_read_binary(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      auto input = check_string_reference(L, 2);
+      check(mbedtls_mpi_read_binary(self->get(), input.data(), input.size()));
     }
   }
 
@@ -50,8 +50,8 @@ namespace brigid {
 
       set_field(L, -1, "bitlen", function<impl_bitlen>());
       set_field(L, -1, "size", function<impl_size>());
-      set_field(L, -1, "read_binary", function<impl_read_binary>());
       set_field(L, -1, "write_binary", function<impl_write_binary>());
+      set_field(L, -1, "read_binary", function<impl_read_binary>());
     }
     lua_setfield(L, -2, "mpi");
   }

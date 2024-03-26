@@ -32,9 +32,9 @@ namespace brigid {
         luaL_argerror(L, 2, "out of bounds");
         return;
       }
-      std::vector<unsigned char> buffer(size);
-      check(mbedtls_ctr_drbg_random(self->get(), buffer.data(), buffer.size()));
-      push_string_reference(L, buffer);
+      std::vector<unsigned char> output(size);
+      check(mbedtls_ctr_drbg_random(self->get(), output.data(), output.size()));
+      push_string_reference(L, output);
     }
   }
 

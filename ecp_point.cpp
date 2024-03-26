@@ -12,27 +12,27 @@ namespace brigid {
       auto* self = self_t::check(L, 1);
       auto* group = ecp_group_t::check(L, 2);
       auto format = luaL_optinteger(L, 3, MBEDTLS_ECP_PF_UNCOMPRESSED);
-      std::array<unsigned char, 128> buffer;
-      std::size_t buffer_size = 0;
+      std::array<unsigned char, 128> output;
+      std::size_t output_size = 0;
       check(mbedtls_ecp_point_write_binary(
           group->get(),
           self->get(),
           format,
-          &buffer_size,
-          buffer.data(),
-          buffer.size()));
-      push_string_reference(L, string_reference(buffer.data(), buffer_size));
+          &output_size,
+          output.data(),
+          output.size()));
+      push_string_reference(L, string_reference(output.data(), output_size));
     }
 
     void impl_read_binary(lua_State* L) {
       auto* self = self_t::check(L, 1);
       auto* group = ecp_group_t::check(L, 2);
-      auto source = check_string_reference(L, 3);
+      auto input = check_string_reference(L, 3);
       check(mbedtls_ecp_point_read_binary(
           group->get(),
           self->get(),
-          source.data(),
-          source.size()));
+          input.data(),
+          input.size()));
     }
   }
 

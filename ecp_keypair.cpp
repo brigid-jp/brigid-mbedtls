@@ -22,38 +22,38 @@ namespace brigid {
 
     void impl_set_group(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto* source = ecp_group_t::check(L, 2);
-      check(mbedtls_ecp_group_copy(&self->get()->MBEDTLS_PRIVATE(grp), source->get()));
+      auto* group = ecp_group_t::check(L, 2);
+      check(mbedtls_ecp_group_copy(&self->get()->MBEDTLS_PRIVATE(grp), group->get()));
     }
 
     void impl_get_group(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto* result = ecp_group_t::construct(L);
-      check(mbedtls_ecp_group_copy(result->get(), &self->get()->MBEDTLS_PRIVATE(grp)));
+      auto* group = ecp_group_t::construct(L);
+      check(mbedtls_ecp_group_copy(group->get(), &self->get()->MBEDTLS_PRIVATE(grp)));
     }
 
     void impl_set_key(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto* source = mpi_t::check(L, 2);
-      check(mbedtls_mpi_copy(&self->get()->MBEDTLS_PRIVATE(d), source->get()));
+      auto* key = mpi_t::check(L, 2);
+      check(mbedtls_mpi_copy(&self->get()->MBEDTLS_PRIVATE(d), key->get()));
     }
 
     void impl_get_key(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto* result = mpi_t::construct(L);
-      check(mbedtls_mpi_copy(result->get(), &self->get()->MBEDTLS_PRIVATE(d)));
+      auto* key = mpi_t::construct(L);
+      check(mbedtls_mpi_copy(key->get(), &self->get()->MBEDTLS_PRIVATE(d)));
     }
 
     void impl_set_public_key(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto* source = ecp_point_t::check(L, 2);
-      check(mbedtls_ecp_copy(&self->get()->MBEDTLS_PRIVATE(Q), source->get()));
+      auto* public_key = ecp_point_t::check(L, 2);
+      check(mbedtls_ecp_copy(&self->get()->MBEDTLS_PRIVATE(Q), public_key->get()));
     }
 
     void impl_get_public_key(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto* result = ecp_point_t::construct(L);
-      check(mbedtls_ecp_copy(result->get(), &self->get()->MBEDTLS_PRIVATE(Q)));
+      auto* public_key = ecp_point_t::construct(L);
+      check(mbedtls_ecp_copy(public_key->get(), &self->get()->MBEDTLS_PRIVATE(Q)));
     }
   }
 

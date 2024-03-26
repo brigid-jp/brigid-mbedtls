@@ -10,46 +10,48 @@ namespace brigid {
 
     void impl_setup(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto info_type = static_cast<mbedtls_pk_type_t>(luaL_checkinteger(L, 2));
-      check(mbedtls_pk_setup(self->get(), mbedtls_pk_info_from_type(info_type)));
+      auto pk_type = static_cast<mbedtls_pk_type_t>(luaL_checkinteger(L, 2));
+      check(mbedtls_pk_setup(self->get(), mbedtls_pk_info_from_type(pk_type)));
     }
 
     void impl_set_ec(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto* source = ecp_keypair_t::check(L, 2);
-      auto* result = mbedtls_pk_ec(*self->get());
-      if (!result) {
+      auto* src = ecp_keypair_t::check(L, 2);
+      auto* dst = mbedtls_pk_ec(*self->get());
+      if (!dst) {
         luaL_argerror(L, 1, "EC context missing in the PK context");
+        return;
       }
       check(mbedtls_ecp_export(
-          source->get(),
-          &result->MBEDTLS_PRIVATE(grp),
-          &result->MBEDTLS_PRIVATE(d),
-          &result->MBEDTLS_PRIVATE(Q)));
+          src->get(),
+          &dst->MBEDTLS_PRIVATE(grp),
+          &dst->MBEDTLS_PRIVATE(d),
+          &dst->MBEDTLS_PRIVATE(Q)));
     }
 
     void impl_get_ec(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto* source = mbedtls_pk_ec(*self->get());
-      if (!source) {
+      auto* src = mbedtls_pk_ec(*self->get());
+      if (!src) {
         luaL_argerror(L, 1, "EC context missing in the PK context");
+        return;
       }
-      auto* result = ecp_keypair_t::construct(L);
+      auto* dst = ecp_keypair_t::construct(L);
       check(mbedtls_ecp_export(
-          source,
-          &result->get()->MBEDTLS_PRIVATE(grp),
-          &result->get()->MBEDTLS_PRIVATE(d),
-          &result->get()->MBEDTLS_PRIVATE(Q)));
+          src,
+          &dst->get()->MBEDTLS_PRIVATE(grp),
+          &dst->get()->MBEDTLS_PRIVATE(d),
+          &dst->get()->MBEDTLS_PRIVATE(Q)));
     }
 
     void impl_parse_key(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto source = check_string_reference(L, 2);
+      auto key = check_string_reference(L, 2);
       auto* ctr_drbg = ctr_drbg_t::check(L, 3);
       check(mbedtls_pk_parse_key(
           self->get(),
-          source.data(),
-          source.size() + 1,
+          key.data(),
+          key.size() + 1,
           nullptr,
           0,
           mbedtls_ctr_drbg_random,
@@ -58,11 +60,11 @@ namespace brigid {
 
     void impl_parse_public_key(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto source = check_string_reference(L, 2);
+      auto public_key = check_string_reference(L, 2);
       check(mbedtls_pk_parse_public_key(
           self->get(),
-          source.data(),
-          source.size() + 1));
+          public_key.data(),
+          public_key.size() + 1));
     }
 
     // mbedtls-3.5.2のDERの最大長を調べた。RSAの秘密鍵で4096bytes、公開鍵で
@@ -83,16 +85,16 @@ namespace brigid {
 
     void impl_write_key_pem(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      std::array<unsigned char, 4096> buffer;
-      check(mbedtls_pk_write_key_pem(self->get(), buffer.data(), buffer.size()));
-      lua_pushstring(L, reinterpret_cast<const char*>(buffer.data()));
+      std::array<unsigned char, 4096> output;
+      check(mbedtls_pk_write_key_pem(self->get(), output.data(), output.size()));
+      lua_pushstring(L, reinterpret_cast<const char*>(output.data()));
     }
 
     void impl_write_pubkey_pem(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      std::array<unsigned char, 8192> buffer;
-      check(mbedtls_pk_write_pubkey_pem(self->get(), buffer.data(), buffer.size()));
-      lua_pushstring(L, reinterpret_cast<const char*>(buffer.data()));
+      std::array<unsigned char, 8192> output;
+      check(mbedtls_pk_write_pubkey_pem(self->get(), output.data(), output.size()));
+      lua_pushstring(L, reinterpret_cast<const char*>(output.data()));
     }
   }
 

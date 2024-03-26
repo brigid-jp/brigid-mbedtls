@@ -9,7 +9,7 @@ namespace brigid {
 
     lua_getfield(L, LUA_REGISTRYINDEX, "brigid.mbedtls.runtime_error_policy");
     std::size_t size = 0;
-    if (const char* data = lua_tolstring(L, -1, &size)) {
+    if (const auto* data = lua_tolstring(L, -1, &size)) {
       result = size == 5 && strncmp(data, "error", 5) == 0;
     }
     lua_pop(L, 1);
@@ -21,7 +21,7 @@ namespace brigid {
     if (result != 0) {
       // mbedtls-3.5.2のlibrary/error.cを調べたところ、エラーメッセージの最大長
       // は134bytesだった。
-      std::array<char, 257> buffer;
+      std::array<char, 256> buffer;
       mbedtls_strerror(result, buffer.data(), buffer.size());
       throw std::runtime_error(buffer.data());
     }

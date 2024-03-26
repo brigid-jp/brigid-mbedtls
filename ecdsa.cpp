@@ -10,8 +10,8 @@ namespace brigid {
   namespace {
     void impl_sign_det_ext(lua_State* L) {
       auto* group = ecp_group_t::check(L, 1);
-      auto* d = mpi_t::check(L, 2);
-      auto source = check_string_reference(L, 3);
+      auto* key = mpi_t::check(L, 2);
+      auto hash = check_string_reference(L, 3);
       auto md_algorithm = static_cast<mbedtls_md_type_t>(luaL_checkinteger(L, 4));
       auto* ctr_drbg = ctr_drbg_t::check(L, 5);
       auto* r = mpi_t::construct(L);
@@ -20,9 +20,9 @@ namespace brigid {
           group->get(),
           r->get(),
           s->get(),
-          d->get(),
-          source.data(),
-          source.size(),
+          key->get(),
+          hash.data(),
+          hash.size(),
           md_algorithm,
           mbedtls_ctr_drbg_random,
           ctr_drbg->get()));
@@ -30,15 +30,15 @@ namespace brigid {
 
     void impl_verify(lua_State* L) {
       auto* group = ecp_group_t::check(L, 1);
-      auto source = check_string_reference(L, 2);
-      auto* q = ecp_point_t::check(L, 3);
+      auto hash = check_string_reference(L, 2);
+      auto* public_key = ecp_point_t::check(L, 3);
       auto* r = mpi_t::check(L, 4);
       auto* s = mpi_t::check(L, 5);
       check(mbedtls_ecdsa_verify(
           group->get(),
-          source.data(),
-          source.size(),
-          q->get(),
+          hash.data(),
+          hash.size(),
+          public_key->get(),
           r->get(),
           s->get()));
     }

@@ -17,24 +17,24 @@ namespace brigid {
 
     void impl_get_params(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto* keypair = ecp_keypair_t::check(L, 2);
+      auto* key = ecp_keypair_t::check(L, 2);
       auto side = static_cast<mbedtls_ecdh_side>(luaL_checkinteger(L, 3));
-      check(mbedtls_ecdh_get_params(self->get(), keypair->get(), side));
+      check(mbedtls_ecdh_get_params(self->get(), key->get(), side));
     }
 
     void impl_calc_secret(lua_State* L) {
       auto* self = self_t::check(L, 1);
       auto* ctr_drbg = ctr_drbg_t::check(L, 2);
-      std::array<unsigned char, 128> buffer;
-      std::size_t buffer_size = 0;
+      std::array<unsigned char, 128> secret;
+      std::size_t secret_size = 0;
       check(mbedtls_ecdh_calc_secret(
           self->get(),
-          &buffer_size,
-          buffer.data(),
-          buffer.size(),
+          &secret_size,
+          secret.data(),
+          secret.size(),
           mbedtls_ctr_drbg_random,
           ctr_drbg->get()));
-      push_string_reference(L, string_reference(buffer.data(), buffer_size));
+      push_string_reference(L, string_reference(secret.data(), secret_size));
     }
   }
 

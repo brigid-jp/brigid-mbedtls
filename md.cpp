@@ -8,9 +8,9 @@ namespace brigid {
 
     void impl_setup(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto type = static_cast<mbedtls_md_type_t>(luaL_checkinteger(L, 2));
+      auto md_algorithm = static_cast<mbedtls_md_type_t>(luaL_checkinteger(L, 2));
       auto hmac = lua_toboolean(L, 3);
-      check(mbedtls_md_setup(self->get(), mbedtls_md_info_from_type(type), hmac));
+      check(mbedtls_md_setup(self->get(), mbedtls_md_info_from_type(md_algorithm), hmac));
     }
 
     void impl_starts(lua_State* L) {
@@ -20,36 +20,36 @@ namespace brigid {
 
     void impl_update(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto source = check_string_reference(L, 2);
-      check(mbedtls_md_update(self->get(), source.data(), source.size()));
+      auto input = check_string_reference(L, 2);
+      check(mbedtls_md_update(self->get(), input.data(), input.size()));
     }
 
     void impl_finish(lua_State* L) {
       auto* self = self_t::check(L, 1);
       auto size = mbedtls_md_get_size(self->get()->MBEDTLS_PRIVATE(md_info));
-      std::vector<unsigned char> buffer(size);
-      check(mbedtls_md_finish(self->get(), buffer.data()));
-      push_string_reference(L, buffer);
+      std::vector<unsigned char> output(size);
+      check(mbedtls_md_finish(self->get(), output.data()));
+      push_string_reference(L, output);
     }
 
     void impl_hmac_starts(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto source = check_string_reference(L, 2);
-      check(mbedtls_md_hmac_starts(self->get(), source.data(), source.size()));
+      auto key = check_string_reference(L, 2);
+      check(mbedtls_md_hmac_starts(self->get(), key.data(), key.size()));
     }
 
     void impl_hmac_update(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto source = check_string_reference(L, 2);
-      check(mbedtls_md_hmac_update(self->get(), source.data(), source.size()));
+      auto input = check_string_reference(L, 2);
+      check(mbedtls_md_hmac_update(self->get(), input.data(), input.size()));
     }
 
     void impl_hmac_finish(lua_State* L) {
       auto* self = self_t::check(L, 1);
       auto size = mbedtls_md_get_size(self->get()->MBEDTLS_PRIVATE(md_info));
-      std::vector<unsigned char> buffer(size);
-      check(mbedtls_md_hmac_finish(self->get(), buffer.data()));
-      push_string_reference(L, buffer);
+      std::vector<unsigned char> output(size);
+      check(mbedtls_md_hmac_finish(self->get(), output.data()));
+      push_string_reference(L, output);
     }
   }
 

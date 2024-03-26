@@ -11,9 +11,9 @@ namespace brigid {
 
     void impl_setkey(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto cipher_id = static_cast<mbedtls_cipher_id_t>(luaL_checkinteger(L, 2));
+      auto cipher = static_cast<mbedtls_cipher_id_t>(luaL_checkinteger(L, 2));
       auto key = check_string_reference(L, 3);
-      check(mbedtls_gcm_setkey(self->get(), cipher_id, key.data(), key.size() * 8));
+      check(mbedtls_gcm_setkey(self->get(), cipher, key.data(), key.size() * 8));
     }
 
     void impl_starts(lua_State* L) {
@@ -25,17 +25,17 @@ namespace brigid {
 
     void impl_update(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto source = check_string_reference(L, 2);
-      std::vector<unsigned char> buffer(source.size() + 15);
-      std::size_t buffer_size = 0;
+      auto input = check_string_reference(L, 2);
+      std::vector<unsigned char> output(input.size() + 15);
+      std::size_t output_size = 0;
       check(mbedtls_gcm_update(
           self->get(),
-          source.data(),
-          source.size(),
-          buffer.data(),
-          buffer.size(),
-          &buffer_size));
-      push_string_reference(L, string_reference(buffer.data(), buffer_size));
+          input.data(),
+          input.size(),
+          output.data(),
+          output.size(),
+          &output_size));
+      push_string_reference(L, string_reference(output.data(), output_size));
     }
 
     void impl_finish(lua_State* L) {
@@ -45,17 +45,17 @@ namespace brigid {
         luaL_argerror(L, 2, "out of bounds");
         return;
       }
-      std::array<unsigned char, 15> buffer;
-      std::size_t buffer_size = 0;
+      std::array<unsigned char, 15> output;
+      std::size_t output_size = 0;
       std::vector<unsigned char> tag(tag_size);
       check(mbedtls_gcm_finish(
           self->get(),
-          buffer.data(),
-          buffer.size(),
-          &buffer_size,
+          output.data(),
+          output.size(),
+          &output_size,
           tag.data(),
           tag.size()));
-      push_string_reference(L, string_reference(buffer.data(), buffer_size));
+      push_string_reference(L, string_reference(output.data(), output_size));
       push_string_reference(L, tag);
     }
   }
