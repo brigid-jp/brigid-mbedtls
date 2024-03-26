@@ -14,7 +14,7 @@ check:
 install:
 	$(MAKE) -C brigid install
 
-archive:
+dist:
 	./archive.sh
 
 $(DEPEND):
