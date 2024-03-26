@@ -28,6 +28,13 @@ namespace brigid {
   }
 
   namespace {
+    void impl_get_version(lua_State* L) {
+      static constexpr const char* version =
+#include "brigid-mbedtls-version"
+      ;
+      lua_pushstring(L, version);
+    }
+
     void impl_set_runtime_error_policy(lua_State* L) {
       lua_pushvalue(L, 1);
       lua_setfield(L, LUA_REGISTRYINDEX, "brigid.mbedtls.runtime_error_policy");
@@ -42,6 +49,7 @@ namespace brigid {
     lua_pushstring(L, "fail");
     lua_setfield(L, LUA_REGISTRYINDEX, "brigid.mbedtls.runtime_error_policy");
 
+    set_field(L, -1, "get_version", function<impl_get_version>());
     set_field(L, -1, "set_runtime_error_policy", function<impl_set_runtime_error_policy>());
     set_field(L, -1, "get_runtime_error_policy", function<impl_get_runtime_error_policy>());
   }
