@@ -2,15 +2,13 @@
 
 ## MBed TLSのビルド
 
-テストあり。
-
 ```shell
 make CFLAGS="-O2 -fPIC" -j 8
 make check
 ```
 
-テストなし。
+ライブラリだけビルドする。
 
 ```shell
-make CFLAGS="-O2 -fPIC" -j 8 no_test
+make CFLAGS="-O2 -fPIC" -j 8 lib
 ```

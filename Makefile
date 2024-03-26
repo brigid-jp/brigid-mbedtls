@@ -14,8 +14,8 @@ check:
 install:
 	$(MAKE) -C brigid install
 
-$(DEPEND):
-	$(MAKE) -C mbedtls -j 8 lib
-
 archive:
 	./archive.sh
+
+$(DEPEND):
+	$(MAKE) -C mbedtls -j 8 lib
