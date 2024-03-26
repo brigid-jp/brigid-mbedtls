@@ -1,37 +1,13 @@
 local mbedtls = require "brigid.mbedtls"
+mbedtls.set_runtime_error_policy "error"
+local test = require "test"
 
-local debug = (tonumber(os.getenv "BRIGID_DEBUG") or 0) > 0
+local ctr_drbg = mbedtls.ctr_drbg():seed(mbedtls.entropy())
 
-do
-  local pk = mbedtls.pk()
-  local result, message = pk:setup(mbedtls.pk.NONE)
-  if debug then
-    print(message)
-  end
-  assert(not result)
-  assert(pk:setup(mbedtls.pk.ECKEY))
-end
+local pk = mbedtls.pk():parse_key(test.secp256r1_1.key_pem, ctr_drbg)
+assert(pk:write_key_pem() == test.secp256r1_1.key_pem)
+assert(pk:write_pubkey_pem() == test.secp256r1_1.pub_pem)
 
--- openssl ecparam -genkey -name prime256v1 -noout >key1.pem
-local key_pem = [[
------BEGIN EC PRIVATE KEY-----
-MHcCAQEEII7NAJCFPZZP6aLyblWg2kXD1tfRgPSjAWr8eqpYzKH8oAoGCCqGSM49
-AwEHoUQDQgAE8xGMev+n8tdsj7S3yLkWYy84J5DYbh/cS6zrRM+c1x38WCfd2RMO
-SDM4EkWx84hiV/HcVV5aLyeQF5pmTEsvoA==
------END EC PRIVATE KEY-----
-]]
-
--- openssl ec -pubout <key1.pem >pubkey1.pem
-local pubkey_pem = [[
------BEGIN PUBLIC KEY-----
-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8xGMev+n8tdsj7S3yLkWYy84J5DY
-bh/cS6zrRM+c1x38WCfd2RMOSDM4EkWx84hiV/HcVV5aLyeQF5pmTEsvoA==
------END PUBLIC KEY-----
-]]
-
-local pk = mbedtls.pk()
-local entropy = mbedtls.entropy()
-local ctr_drbg = mbedtls.ctr_drbg():seed(entropy)
-assert(pk:parse_key(key_pem, ctr_drbg))
-assert(pk:write_key_pem() == key_pem)
-assert(pk:write_pubkey_pem() == pubkey_pem)
+local pk = mbedtls.pk():parse_public_key(test.secp256r1_1.pub_pem, ctr_drbg)
+assert(pk:write_key_pem() ~= test.secp256r1_1.key_pem)
+assert(pk:write_pubkey_pem() == test.secp256r1_1.pub_pem)
