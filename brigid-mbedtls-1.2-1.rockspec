@@ -1,7 +1,7 @@
 package = "brigid-mbedtls"
-version = "1.1-1"
+version = "1.2-1"
 source = {
-  url = "https://github.com/brigid-jp/brigid-mbedtls/releases/download/v1.1/brigid-mbedtls-1.1.zip";
+  url = "https://github.com/brigid-jp/brigid-mbedtls/releases/download/v1.2/brigid-mbedtls-1.2.zip";
 }
 description = {
   summary = "Lua bindings for Mbed TLS";
