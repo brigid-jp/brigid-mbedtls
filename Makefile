@@ -1,8 +1,8 @@
 export CFLAGS LIBFLAG LUA_INCDIR LIBDIR
 
 all:
-	$(MAKE) -j 8 -C mbedtls
-	$(MAKE) -j 8 -C brigid
+	$(MAKE) -C mbedtls -j 8 no_test
+	$(MAKE) -C brigid -j 8 all
 
 clean:
 	$(MAKE) -C brigid clean
