@@ -11,8 +11,8 @@ namespace brigid {
 
     void impl_setup(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto group_id = static_cast<mbedtls_ecp_group_id>(luaL_checkinteger(L, 2));
-      check(mbedtls_ecdh_setup(self->get(), group_id));
+      auto grp_id = static_cast<mbedtls_ecp_group_id>(luaL_checkinteger(L, 2));
+      check(mbedtls_ecdh_setup(self->get(), grp_id));
     }
 
     void impl_get_params(lua_State* L) {

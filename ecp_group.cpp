@@ -7,8 +7,13 @@ namespace brigid {
 
     void impl_load(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto group_id = static_cast<mbedtls_ecp_group_id>(luaL_checkinteger(L, 2));
-      check(mbedtls_ecp_group_load(self->get(), group_id));
+      auto grp_id = static_cast<mbedtls_ecp_group_id>(luaL_checkinteger(L, 2));
+      check(mbedtls_ecp_group_load(self->get(), grp_id));
+    }
+
+    void impl_get_id(lua_State* L) {
+      auto* self = self_t::check(L, 1);
+      lua_pushinteger(L, self->get()->id);
     }
 
     void impl_get_curve_info(lua_State* L) {
@@ -40,6 +45,7 @@ namespace brigid {
       lua_setmetatable(L, -2);
 
       set_field(L, -1, "load", function<impl_load>());
+      set_field(L, -1, "get_id", function<impl_get_id>());
       set_field(L, -1, "get_curve_info", function<impl_get_curve_info>());
     }
     lua_setfield(L, -2, "group");

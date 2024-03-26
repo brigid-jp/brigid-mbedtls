@@ -14,7 +14,7 @@ do
   assert(not result)
   assert(group:load(mbedtls.ecp.DP_SECP256R1))
 
-  local info = assert(group:get_curve_info())
+  local info = assert(mbedtls.ecp.curve_info_from_grp_id(group:get_id()))
   if debug then
     print(info.grp_id)
     print(info.tls_id)
