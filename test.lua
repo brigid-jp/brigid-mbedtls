@@ -1,6 +1,26 @@
+local debug = (tonumber(os.getenv "BRIGID_MBETDLTS_DEBUG") or 0) > 0
+
 return {
 
-debug = (tonumber(os.getenv "BRIGID_MBETDLTS_DEBUG") or 0) > 0;
+debug = debug;
+
+assume_fail = function (f, ...)
+  local result, message = f(...)
+  if debug then
+    print("assume_fail: "..message)
+  end
+  assert(not result)
+  assert(message)
+end;
+
+assume_error = function (...)
+  local result, message = pcall(...)
+  if debug then
+    print("assume_error: "..message)
+  end
+  assert(not result)
+  assert(message)
+end;
 
 -- https://datatracker.ietf.org/doc/html/rfc8188
 rfc8188 = {
