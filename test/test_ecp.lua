@@ -13,6 +13,14 @@ do
   end
   assert(not result)
   assert(group:load(mbedtls.ecp.DP_SECP256R1))
+
+  local info = assert(group:get_curve_info())
+  if debug then
+    print(info.grp_id)
+    print(info.tls_id)
+    print(info.bit_size)
+    print(info.name)
+  end
 end
 
 do
