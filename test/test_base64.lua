@@ -1,33 +1,32 @@
 local mbedtls = require "brigid.mbedtls"
-
-local debug = (tonumber(os.getenv "BRIGID_DEBUG") or 0) > 0
+mbedtls.set_runtime_error_policy "error"
 
 local data = {
   { "", "" };
   { "f", "Zg==" };
   { "fo", "Zm8=" };
   { "foo", "Zm9v" };
-  { ("foo"):rep(257), ("Zm9v"):rep(257) };
+  { "foob", "Zm9vYg==" };
+  { "fooba", "Zm9vYmE=" };
+  { "foobar", "Zm9vYmFy" };
+  { ("foobar"):rep(512), ("Zm9vYmFy"):rep(512) };
   { "日本語", "5pel5pys6Kqe" };
-  { ("日本語"):rep(127), ("5pel5pys6Kqe"):rep(127) };
+  { ("日本語"):rep(512), ("5pel5pys6Kqe"):rep(512) };
 }
 
 for i, v in ipairs(data) do
-  if debug then
-    print(v[1], v[2])
-  end
   assert(mbedtls.base64.encode(v[1]) == v[2])
   assert(mbedtls.base64.decode(v[2]) == v[1])
 end
 
-local function encode_base64url(source)
-  local buffer = mbedtls.base64.encode(source)
-  return (buffer:gsub("%+", "-"):gsub("/", "_"):gsub("=+$", ""))
+local function encode_base64url(input)
+  local output = mbedtls.base64.encode(input)
+  return (output:gsub("[+/]", { ["+"] = "-", ["/"] = "_" }):gsub("=+$", ""))
 end
 
-local function decode_base64url(source)
-  local buffer = source:gsub("%-", "+"):gsub("_", "/")
-  return mbedtls.base64.decode(buffer..("="):rep(-#buffer % 4))
+local function decode_base64url(input)
+  input = input:gsub("[%-_]", { ["-"] = "+", ["_"] = "/" })
+  return mbedtls.base64.decode(input..("="):rep(-#input % 4))
 end
 
 local data = {
@@ -36,9 +35,6 @@ local data = {
 }
 
 for i, v in ipairs(data) do
-  if debug then
-    print(v[1], v[2])
-  end
   assert(encode_base64url(v[1]) == v[2])
   assert(decode_base64url(v[2]) == v[1])
 end
