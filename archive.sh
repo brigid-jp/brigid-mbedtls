@@ -6,7 +6,8 @@ here=`(cd "$here" && pwd)`
 cd "$here"
 version=`cat brigid-mbedtls-version`
 version=`expr "X$version" : 'X"\([^"]*\)"'`
+prefix=brigid-mbedtls-$version
 
-git ls-files --recurse-submodules
-# git archive --prefix "$prefix/" HEAD
-# (cd mbedtls && git archive --prefix "$prefix/mbedtls/" HEAD)
+git archive --prefix "$prefix/" HEAD | (cd brigid && tar xf -)
+(cd mbedtls && git archive --prefix "$prefix/mbedtls/" HEAD) | (cd brigid && tar xf -)
+# (cd "brigid/$prefix/mbedtls/tests" && rm -fr data_files suites)
