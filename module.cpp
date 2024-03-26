@@ -14,6 +14,7 @@ namespace brigid {
   void initialize_md(lua_State*);
   void initialize_mpi(lua_State*);
   void initialize_pk(lua_State*);
+  void initialize_version(lua_State*);
 
   void initialize(lua_State* L) {
     initialize_common(L);
@@ -28,6 +29,7 @@ namespace brigid {
     initialize_md(L);
     initialize_mpi(L);
     initialize_pk(L);
+    initialize_version(L);
   }
 }
 

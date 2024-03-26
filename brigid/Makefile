@@ -21,6 +21,7 @@ OBJS = \
 	md.o \
 	mpi.o \
 	pk.o \
+	version.o \
 	module.o
 
 all: $(TARGET)
