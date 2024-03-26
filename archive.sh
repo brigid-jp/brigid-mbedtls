@@ -14,3 +14,4 @@ git archive --prefix "$prefix/" HEAD | (cd brigid && tar xf -)
 cd brigid
 (cd "$prefix/mbedtls" && rm -r docs programs tests visualc && mkdir tests)
 tar cf - "$prefix" | gzip -9 >"$prefix.tar.gz"
+rm -r "$prefix"

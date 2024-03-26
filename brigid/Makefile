@@ -27,7 +27,7 @@ OBJS = \
 all: $(TARGET)
 
 clean:
-	rm -f *.d *.o $(TARGET)
+	rm -f *.d *.o $(TARGET) *.tar.gz
 
 install:
 	mkdir -p $(ROCK_LIBDIR)/brigid
