@@ -24,7 +24,7 @@ namespace brigid {
 
     void impl_calc_secret(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto* ctr_drbg = ctr_drbg_t::check(L, 2);
+      auto* ctr_drbg = ctr_drbg_t::optional(L, 2);
       std::array<unsigned char, 128> secret;
       std::size_t secret_size = 0;
       check(mbedtls_ecdh_calc_secret(

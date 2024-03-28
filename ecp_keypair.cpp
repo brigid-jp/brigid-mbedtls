@@ -12,7 +12,7 @@ namespace brigid {
     void impl_gen_key(lua_State* L) {
       auto* self = self_t::check(L, 1);
       auto grp_id = static_cast<mbedtls_ecp_group_id>(luaL_checkinteger(L, 2));
-      auto* ctr_drbg = ctr_drbg_t::check(L, 3);
+      auto* ctr_drbg = ctr_drbg_t::optional(L, 3);
       check(mbedtls_ecp_gen_key(
           grp_id,
           self->get(),

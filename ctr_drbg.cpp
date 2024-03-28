@@ -13,7 +13,7 @@ namespace brigid {
 
     void impl_seed(lua_State* L) {
       auto* self = self_t::check(L, 1);
-      auto* entropy = entropy_t::check(L, 2);
+      auto* entropy = entropy_t::optional(L, 2);
       check(mbedtls_ctr_drbg_seed(
           self->get(),
           mbedtls_entropy_func,

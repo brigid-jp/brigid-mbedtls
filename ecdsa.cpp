@@ -13,7 +13,7 @@ namespace brigid {
       auto* key = mpi_t::check(L, 2);
       auto hash = check_string_reference(L, 3);
       auto md_algorithm = static_cast<mbedtls_md_type_t>(luaL_checkinteger(L, 4));
-      auto* ctr_drbg = ctr_drbg_t::check(L, 5);
+      auto* ctr_drbg = ctr_drbg_t::optional(L, 5);
       auto* r = mpi_t::construct(L);
       auto* s = mpi_t::construct(L);
       check(mbedtls_ecdsa_sign_det_ext(

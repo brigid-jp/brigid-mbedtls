@@ -202,6 +202,15 @@ namespace brigid {
       return static_cast<T*>(luaL_checkudata(L, arg, T::name));
     }
 
+    static T* optional(lua_State* L, int arg) {
+      if (lua_isnoneornil(L, arg)) {
+        stack_guard guard(L);
+        return T::get_default(L);
+      } else {
+        return check(L, arg);
+      }
+    }
+
     static T* test(lua_State* L, int index) {
 #if LUA_VERSION_NUM >= 502
       return static_cast<T*>(luaL_testudata(L, index, T::name));

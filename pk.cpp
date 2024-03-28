@@ -47,7 +47,7 @@ namespace brigid {
     void impl_parse_key(lua_State* L) {
       auto* self = self_t::check(L, 1);
       auto key = check_string_reference(L, 2);
-      auto* ctr_drbg = ctr_drbg_t::check(L, 3);
+      auto* ctr_drbg = ctr_drbg_t::optional(L, 3);
       check(mbedtls_pk_parse_key(
           self->get(),
           key.data(),
