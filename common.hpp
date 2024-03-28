@@ -10,11 +10,27 @@
 namespace brigid {
   bool runtime_error_policy_is_error(lua_State*);
 
+  class stack_guard {
+  public:
+    stack_guard(const stack_guard&) = delete;
+    stack_guard& operator=(const stack_guard&) = delete;
+
+    explicit stack_guard(lua_State* L) : state_(L), top_(lua_gettop(L)) {}
+
+    ~stack_guard() {
+      lua_settop(state_, top_);
+    }
+
+  private:
+    lua_State* state_;
+    int top_;
+  };
+
   template <void (*T)(lua_State*)>
   struct function {
     static int value(lua_State* L) {
+      auto top = lua_gettop(L);
       try {
-        auto top = lua_gettop(L);
         T(L);
         auto result = lua_gettop(L) - top;
         if (result > 0) {
@@ -28,6 +44,7 @@ namespace brigid {
           return 1;
         }
       } catch (const std::runtime_error& e) {
+        lua_settop(L, top);
         if (runtime_error_policy_is_error(L)) {
           return luaL_error(L, "%s", e.what());
         } else {
@@ -36,6 +53,7 @@ namespace brigid {
           return 2;
         }
       } catch (const std::exception& e) {
+        lua_settop(L, top);
         return luaL_error(L, "%s", e.what());
       }
     }
@@ -182,6 +200,23 @@ namespace brigid {
 
     static T* check(lua_State* L, int arg) {
       return static_cast<T*>(luaL_checkudata(L, arg, T::name));
+    }
+
+    static T* test(lua_State* L, int index) {
+#if LUA_VERSION_NUM >= 502
+      return static_cast<T*>(luaL_testudata(L, index, T::name));
+#else
+      stack_guard guard(L);
+      if (T* userdata = static_cast<T*>(lua_touserdata(L, index))) {
+        if (lua_getmetatable(L, index)) {
+          luaL_getmetatable(L, T::name);
+          if (lua_rawequal(L, -1, -2)) {
+            return userdata;
+          }
+        }
+      }
+      return nullptr;
+#endif
     }
 
     static T* construct(lua_State* L) {

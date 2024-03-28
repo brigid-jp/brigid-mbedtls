@@ -12,6 +12,7 @@ namespace brigid {
     mbedtls_ctr_drbg_free> {
   public:
     static constexpr const char* name = "brigid.mbedtls.ctr_drbg";
+    static ctr_drbg_t* get_default(lua_State*);
     thread_reference ref;
   };
 }

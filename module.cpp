@@ -34,7 +34,7 @@ namespace brigid {
 }
 
 extern "C" int luaopen_brigid_mbedtls(lua_State* L) {
-  int top = lua_gettop(L);
+  auto top = lua_gettop(L);
   try {
     lua_newtable(L);
     brigid::initialize(L);

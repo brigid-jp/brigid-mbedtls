@@ -12,6 +12,7 @@ namespace brigid {
     mbedtls_entropy_free> {
   public:
     static constexpr const char* name = "brigid.mbedtls.entropy";
+    static entropy_t* get_default(lua_State*);
   };
 }
 

@@ -4,17 +4,36 @@
 #include <array>
 
 namespace brigid {
-  bool runtime_error_policy_is_error(lua_State* L) {
-    bool result = false;
+  namespace {
+    static constexpr const char* registry_key = "brigid.mbedtls.runtime_error_policy";
 
-    lua_getfield(L, LUA_REGISTRYINDEX, "brigid.mbedtls.runtime_error_policy");
+    void impl_get_version(lua_State* L) {
+      static constexpr const char* version =
+#include "brigid-mbedtls-version"
+      ;
+      lua_pushstring(L, version);
+    }
+
+    void impl_set_runtime_error_policy(lua_State* L) {
+      lua_pushvalue(L, 1);
+      lua_setfield(L, LUA_REGISTRYINDEX, registry_key);
+    }
+
+    void impl_get_runtime_error_policy(lua_State* L) {
+      lua_getfield(L, LUA_REGISTRYINDEX, registry_key);
+    }
+  }
+
+  bool runtime_error_policy_is_error(lua_State* L) {
+    stack_guard guard(L);
+
+    lua_getfield(L, LUA_REGISTRYINDEX, registry_key);
     std::size_t size = 0;
     if (const auto* data = lua_tolstring(L, -1, &size)) {
-      result = size == 5 && strncmp(data, "error", 5) == 0;
+      return size == 5 && strncmp(data, "error", 5) == 0;
+    } else {
+      return false;
     }
-    lua_pop(L, 1);
-
-    return result;
   }
 
   void check(int result) {
@@ -27,27 +46,9 @@ namespace brigid {
     }
   }
 
-  namespace {
-    void impl_get_version(lua_State* L) {
-      static constexpr const char* version =
-#include "brigid-mbedtls-version"
-      ;
-      lua_pushstring(L, version);
-    }
-
-    void impl_set_runtime_error_policy(lua_State* L) {
-      lua_pushvalue(L, 1);
-      lua_setfield(L, LUA_REGISTRYINDEX, "brigid.mbedtls.runtime_error_policy");
-    }
-
-    void impl_get_runtime_error_policy(lua_State* L) {
-      lua_getfield(L, LUA_REGISTRYINDEX, "brigid.mbedtls.runtime_error_policy");
-    }
-  }
-
   void initialize_common(lua_State* L) {
     lua_pushstring(L, "fail");
-    lua_setfield(L, LUA_REGISTRYINDEX, "brigid.mbedtls.runtime_error_policy");
+    lua_setfield(L, LUA_REGISTRYINDEX, registry_key);
 
     set_field(L, -1, "get_version", function<impl_get_version>());
     set_field(L, -1, "set_runtime_error_policy", function<impl_set_runtime_error_policy>());

@@ -28,7 +28,6 @@ if test.debug then
 end
 assert(version:match "^%d+%.%d+$")
 
--- 0x03 05 02 00
 local n = mbedtls.version.get_number()
 local s = mbedtls.version.get_string()
 local f = mbedtls.version.get_string_full()
