@@ -32,15 +32,35 @@ namespace brigid {
       auto* group = ecp_group_t::check(L, 1);
       auto hash = check_string_reference(L, 2);
       auto* public_key = ecp_point_t::check(L, 3);
-      auto* r = mpi_t::check(L, 4);
-      auto* s = mpi_t::check(L, 5);
-      check(mbedtls_ecdsa_verify(
-          group->get(),
-          hash.data(),
-          hash.size(),
-          public_key->get(),
-          r->get(),
-          s->get()));
+
+      if (lua_isstring(L, 4)) {
+        auto size = (group->get()->nbits + 7) / 8;
+        auto data = check_string_reference(L, 4);
+        if (data.size() != size * 2) {
+          luaL_argerror(L, 4, "signature size is invalid");
+        }
+        mpi_t r;
+        mpi_t s;
+        check(mbedtls_mpi_read_binary(r.get(), data.data(), size));
+        check(mbedtls_mpi_read_binary(s.get(), data.data() + size, size));
+        check(mbedtls_ecdsa_verify(
+            group->get(),
+            hash.data(),
+            hash.size(),
+            public_key->get(),
+            r.get(),
+            s.get()));
+      } else {
+        auto* r = mpi_t::test(L, 4);
+        auto* s = mpi_t::check(L, 5);
+        check(mbedtls_ecdsa_verify(
+            group->get(),
+            hash.data(),
+            hash.size(),
+            public_key->get(),
+            r->get(),
+            s->get()));
+      }
     }
   }
 

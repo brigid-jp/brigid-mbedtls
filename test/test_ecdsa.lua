@@ -10,7 +10,16 @@ mbedtls.ecdsa.verify(group, test.sha256.hash, pk:get_ec():get_public_key(), r, s
 
 local r, s = mbedtls.ecdsa.sign_det_ext(group, pk:get_ec():get_key(), test.sha256.hash, mbedtls.md.SHA256, ctr_drbg)
 mbedtls.ecdsa.verify(group, test.sha256.hash, pk:get_ec():get_public_key(), r, s)
+mbedtls.ecdsa.verify(group, test.sha256.hash, pk:get_ec():get_public_key(), test.ecdsa.r..test.ecdsa.s)
 
 test.assume_error(function ()
   mbedtls.ecdsa.verify(group, test.sha256.hash, pk:get_ec():get_public_key(), s, r)
+end)
+
+test.assume_error(function ()
+  mbedtls.ecdsa.verify(group, test.sha256.hash, pk:get_ec():get_public_key(), test.ecdsa.s..test.ecdsa.r)
+end)
+
+test.assume_error(function ()
+  mbedtls.ecdsa.verify(group, test.sha256.hash, pk:get_ec():get_public_key(), test.ecdsa.r..test.ecdsa.s.."    ")
 end)
