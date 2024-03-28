@@ -1,5 +1,8 @@
 #! /bin/sh -e
 
+export LUA_PATH="?.lua;;"
+export LUA_CPATH="?.so;;"
+
 for i in test/test*.lua
 do
   case X$# in
