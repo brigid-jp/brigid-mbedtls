@@ -6,6 +6,37 @@ namespace brigid {
   namespace {
     using self_t = md_t;
 
+    void impl_md(lua_State* L) {
+      auto md_algorithm = static_cast<mbedtls_md_type_t>(luaL_checkinteger(L, 1));
+      auto input = check_string_reference(L, 2);
+      const auto* md_info = mbedtls_md_info_from_type(md_algorithm);
+      auto size = mbedtls_md_get_size(md_info);
+      std::vector<unsigned char> output(size);
+      check(mbedtls_md(
+          md_info,
+          input.data(),
+          input.size(),
+          output.data()));
+      push_string_reference(L, output);
+    }
+
+    void impl_hmac(lua_State* L) {
+      auto md_algorithm = static_cast<mbedtls_md_type_t>(luaL_checkinteger(L, 1));
+      auto key = check_string_reference(L, 2);
+      auto input = check_string_reference(L, 3);
+      const auto* md_info = mbedtls_md_info_from_type(md_algorithm);
+      auto size = mbedtls_md_get_size(md_info);
+      std::vector<unsigned char> output(size);
+      check(mbedtls_md_hmac(
+          md_info,
+          key.data(),
+          key.size(),
+          input.data(),
+          input.size(),
+          output.data()));
+      push_string_reference(L, output);
+    }
+
     void impl_setup(lua_State* L) {
       auto* self = self_t::check(L, 1);
       auto md_algorithm = static_cast<mbedtls_md_type_t>(luaL_checkinteger(L, 2));
@@ -65,6 +96,9 @@ namespace brigid {
       lua_newtable(L);
       set_field(L, -1, "__call", self_t::constructor());
       lua_setmetatable(L, -2);
+
+      set_field(L, -1, "md", function<impl_md>());
+      set_field(L, -1, "hmac", function<impl_hmac>());
 
       set_field(L, -1, "setup", function<impl_setup>());
       set_field(L, -1, "starts", function<impl_starts>());

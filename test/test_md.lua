@@ -15,3 +15,6 @@ local hmac = mbedtls.md()
   :hmac_update(test.sha256.message)
   :hmac_finish()
 assert(hmac == test.sha256.hmac)
+
+assert(mbedtls.md.md(mbedtls.md.SHA256, test.sha256.message) == test.sha256.hash)
+assert(mbedtls.md.hmac(mbedtls.md.SHA256, test.sha256.secret, test.sha256.message) == test.sha256.hmac)
