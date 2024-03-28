@@ -2,7 +2,7 @@ export CFLAGS ROCK_CFLAGS ROCK_LIBFLAG ROCK_LUA_INCDIR ROCK_LIBDIR
 CFLAGS = -std=c99 $(ROCK_CFLAGS)
 DEPEND = mbedtls/library/libmbedcrypto.a
 
-all: $(DEPEND)
+all: $(DEPEND) base64url.hpp
 	$(MAKE) -C brigid -j 8
 
 clean:
@@ -19,3 +19,6 @@ archive:
 
 $(DEPEND):
 	$(MAKE) -C mbedtls -j 8 lib
+
+base64url.hpp: base64url.lua
+	./$< >$@

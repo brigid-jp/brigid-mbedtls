@@ -65,7 +65,7 @@ namespace brigid {
         auto size = (group->get()->nbits + 7) / 8;
         auto signature = check_string_reference(L, 4);
         if (signature.size() != size * 2) {
-          luaL_argerror(L, 4, "signature size is invalid");
+          luaL_argerror(L, 4, "invalid size");
         }
         mpi_t r;
         mpi_t s;
