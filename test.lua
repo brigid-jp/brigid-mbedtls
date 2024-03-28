@@ -2,7 +2,7 @@ local test; test = {
 
 ----------------------------------------------------------------------
 
-debug = (tonumber(os.getenv "BRIGID_MBETDLTS_DEBUG") or 0) > 0;
+debug = (tonumber(os.getenv "BRIGID_MBEDTLS_DEBUG") or 0) > 0;
 
 assume_fail = function (f, ...)
   local result, message = f(...)
