@@ -7,7 +7,7 @@ namespace brigid {
     void impl_encode(lua_State* L) {
       auto input = check_string_reference(L, 1);
 
-      luaL_Buffer output = {};
+      luaL_Buffer output;
       luaL_buffinit(L, &output);
 
       const auto* ptr = input.data();
@@ -45,7 +45,7 @@ namespace brigid {
     void impl_decode(lua_State* L) {
       auto input = check_string_reference(L, 1);
 
-      luaL_Buffer output = {};
+      luaL_Buffer output;
       luaL_buffinit(L, &output);
 
       const auto* ptr = input.data();
