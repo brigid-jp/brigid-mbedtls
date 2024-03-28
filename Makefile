@@ -1,12 +1,21 @@
 export CFLAGS ROCK_CFLAGS ROCK_LIBFLAG ROCK_LUA_INCDIR ROCK_LIBDIR
 CFLAGS = -std=c99 $(ROCK_CFLAGS)
 DEPEND = mbedtls/library/libmbedcrypto.a
+GIT_CLEAN = git clean -d -e '.*.swp' -x
 
 all: $(DEPEND) base64url.hpp
 	$(MAKE) -C brigid -j 8
 
 clean:
 	$(MAKE) -C brigid clean
+
+git-clean-dry-run:
+	$(GIT_CLEAN) -n
+	(cd mbedtls && $(GIT_CLEAN) -n)
+
+git-clean-force:
+	$(GIT_CLEAN) -f
+	(cd mbedtls && $(GIT_CLEAN) -f)
 
 check:
 	./test.sh
