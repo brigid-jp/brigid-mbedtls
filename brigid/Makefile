@@ -1,4 +1,4 @@
-CXXFLAGS += -Wall -W -std=c++11 $(ROCK_CFLAGS)
+CXXFLAGS += -Wall -W -std=c++11 -fvisibility=hidden $(ROCK_CFLAGS)
 CPPFLAGS += -I../mbedtls/include -I$(ROCK_LUA_INCDIR) -MMD
 LDFLAGS += -L../mbedtls/library $(ROCK_LIBFLAG)
 LDLIBS += -lmbedcrypto

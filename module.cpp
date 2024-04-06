@@ -1,6 +1,8 @@
 #include <lua.hpp>
 #include <exception>
 
+#define BRIGID_EXPORT __attribute__ ((visibility ("default")))
+
 namespace brigid {
   void initialize_common(lua_State*);
   void initialize_base64(lua_State*);
@@ -35,7 +37,7 @@ namespace brigid {
   }
 }
 
-extern "C" int luaopen_brigid_mbedtls(lua_State* L) {
+extern "C" int BRIGID_EXPORT luaopen_brigid_mbedtls(lua_State* L) {
   auto top = lua_gettop(L);
   try {
     lua_newtable(L);

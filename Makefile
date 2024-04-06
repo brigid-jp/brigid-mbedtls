@@ -1,5 +1,5 @@
 export CFLAGS ROCK_CFLAGS ROCK_LIBFLAG ROCK_LUA_INCDIR ROCK_LIBDIR
-CFLAGS = -std=c99 $(ROCK_CFLAGS)
+CFLAGS = -std=c99 -fvisibility=hidden $(ROCK_CFLAGS)
 DEPEND = mbedtls/library/libmbedcrypto.a
 GIT_CLEAN = git clean -d -e '.*.swp' -x
 
